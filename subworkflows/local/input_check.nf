@@ -1,44 +1,66 @@
 //
-// Check input samplesheet and get read channels
+// Check input and get vcf channels
+// Sarek outputs VCF files in the form of:
+// ${meta.id}.{tool}.vcf.gz..
+// 'simpleName' should suffice here.
+// Allow file or path as input, automatically check if VCF files are indexed
 //
-
-include { SAMPLESHEET_CHECK } from '../../modules/local/samplesheet_check'
 
 workflow INPUT_CHECK {
     take:
-    samplesheet // file: /path/to/samplesheet.csv
+    samplesheet // samplesheet file or path to VCF files
 
     main:
-    SAMPLESHEET_CHECK ( samplesheet )
-        .csv
-        .splitCsv ( header:true, sep:',' )
-        .map { create_fastq_channel(it) }
-        .set { reads }
+    check_input(samplesheet)
 
     emit:
-    reads                                     // channel: [ val(meta), [ reads ] ]
-    versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
+    vcf  // channel: [ val(meta), [ vcf.gz] , [ vcf.gz.tbi ] ]
 }
 
-// Function to get list of [ meta, [ fastq_1, fastq_2 ] ]
-def create_fastq_channel(LinkedHashMap row) {
-    // create meta map
-    def meta = [:]
-    meta.id         = row.sample
-    meta.single_end = row.single_end.toBoolean()
+def check_input(input){
+    if(input.toString().endsWith('.csv')) {
 
-    // add path(s) of the fastq file(s) to the meta map
-    def fastq_meta = []
-    if (!file(row.fastq_1).exists()) {
-        exit 1, "ERROR: Please check input samplesheet -> Read 1 FastQ file does not exist!\n${row.fastq_1}"
+        Channel.from(input)
+            .splitCsv(header:false, sep:',')
+            .map{ row ->
+
+                fh = file(row[0])
+
+                if(!file(fh).exists()){
+                    log.error("ERROR: Please check input input -> VCF file does not exist: ${fh}")
+                    System.exit(1)
+                }else{
+                    def meta = [:]
+                    fh       = file(row[0])
+                    meta.id  = fh.simpleName
+                    tbi      = fh.toString() + '.tbi'
+                    if(!file(tbi).exists()){
+                        log.error("ERROR: Please make sure the VCF files are indexed with tabix. Offending file: ${tbi}")
+                        System.exit(1)
+                    }
+                    return  [ meta, [ file(fh) ], [ file(tbi) ] ]
+                }
+            }
+            .set { vcf }
+    }else{
+
+        Channel.fromPath( "${input}/*.vcf.gz" )
+            .map{ it ->
+
+                if(!file(it).exists()){
+                    log.error("ERROR: VCF file does not exist at path: ${it}")
+                    System.exit(1)
+                }else{
+                    def meta = [:]
+                    meta.id  = file(it).simpleName
+                    tbi      = it.toString() + '.tbi'
+                    if(!file(tbi).exists()){
+                        log.error("ERROR: Please make sure the VCF files are indexed with tabix. Offending file: ${tbi}")
+                        System.exit(1)
+                    }
+                    return [ meta, [ file(it) ], [ file(tbi) ] ]
+                }
+            }
+            .set { vcf }
     }
-    if (meta.single_end) {
-        fastq_meta = [ meta, [ file(row.fastq_1) ] ]
-    } else {
-        if (!file(row.fastq_2).exists()) {
-            exit 1, "ERROR: Please check input samplesheet -> Read 2 FastQ file does not exist!\n${row.fastq_2}"
-        }
-        fastq_meta = [ meta, [ file(row.fastq_1), file(row.fastq_2) ] ]
-    }
-    return fastq_meta
 }
