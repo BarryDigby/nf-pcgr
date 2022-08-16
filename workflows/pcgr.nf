@@ -34,7 +34,7 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { PCGR as RUN_PCGR            } from '../modules/local/pcgr'
+include { PCGR as RUN_PCGR            } from '../modules/local/PCGR/pcgr'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*

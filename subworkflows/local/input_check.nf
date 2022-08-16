@@ -27,7 +27,7 @@ def check_input(input){
                 fh = file(row[0])
 
                 if(!file(fh).exists()){
-                    log.error("ERROR: Please check input input -> VCF file does not exist: ${fh}")
+                    log.error("ERROR: Check input file (${input}). VCF file does not exist at path: ${fh}")
                     System.exit(1)
                 }else{
                     def meta = [:]
