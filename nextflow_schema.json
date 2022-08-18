@@ -25,96 +25,272 @@
                         "TARGETED"
                     ]
                 },
+                "cpsr_report": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-paste",
+                    "description": "CPSR report file (Gzipped JSON  -  germline report of patient's blood/control sample"
+                },
                 "tumor_site": {
-                    "type": "string",
+                    "type": "number",
                     "fa_icon": "fas fa-male",
                     "description": "Optional integer code to specify primary tumor type/site of query sample",
                     "help_text": "choose any of the following identifiers:\n0 = Any, 1 = Adrenal Gland, 2 = Ampulla of Vater, 3 = Biliary Tract, 4 = Bladder/Urinary Tract, 5 = Bone, 6 = Breast, 7 = Cervix, 8 = CNS/Brain, 9 = Colon/Rectum, 10 = Esophagus/Stomach, 11 = Eye, 12 = Head and Neck, 13 = Kidney, 14 = Liver, 15 = Lung, 16 = Lymphoid, 17 = Myeloid, 18 = Ovary/Fallopian Tube, 19 = Pancreas, 20 = Peripheral Nervous System, 21 = Peritoneum, 22 = Pleura, 23 = Prostate, 24 = Skin, 25 = Soft Tissue, 26 = Testis, 27 = Thymus, 28 = Thyroid, 29 = Uterus, 30 = Vulva/Vagina,\n",
-                    "pattern": "^((0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16|17|18|19|20|21|22|23|24|25|26|27|28|29|30)*,?)*$",
                     "enum": [
-                        "0",
-                        "1",
-                        "2",
-                        "3",
-                        "4",
-                        "5",
-                        "6",
-                        "7",
-                        "8",
-                        "9",
-                        "10",
-                        "11",
-                        "12",
-                        "13",
-                        "14",
-                        "15",
-                        "16",
-                        "17",
-                        "18",
-                        "19",
-                        "20",
-                        "21",
-                        "22",
-                        "23",
-                        "24",
-                        "25",
-                        "26",
-                        "27",
-                        "28",
-                        "29",
-                        "30"
+                        0,
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                        11,
+                        12,
+                        13,
+                        14,
+                        15,
+                        16,
+                        17,
+                        18,
+                        19,
+                        20,
+                        21,
+                        22,
+                        23,
+                        24,
+                        25,
+                        26,
+                        27,
+                        28,
+                        29,
+                        30
                     ],
-                    "default": "0"
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 30
                 },
-                "new_param_30": {
-                    "type": "string"
+                "tumor_purity": {
+                    "type": "string",
+                    "fa_icon": "fas fa-filter",
+                    "description": "Estimated tumor purity (between 0 and 1, (default: None)",
+                    "default": "null"
                 },
-                "new_param_29": {
-                    "type": "string"
+                "tumor_ploidy": {
+                    "type": "string",
+                    "fa_icon": "fas fa-vials",
+                    "description": "Estimated tumor ploidy (default: None)",
+                    "default": "null"
                 },
-                "new_param_28": {
-                    "type": "string"
+                "targte_size_mb": {
+                    "type": "number",
+                    "fa_icon": "fab fa-tumblr",
+                    "default": "34",
+                    "description": "For mutational burden analysis - approximate protein-coding target size in Mb of sequencing assay (default: 34 WGS/WES)"
                 },
-                "new_param_27": {
-                    "type": "string"
+                "estimate_tmb": {
+                    "type": "boolean",
+                    "description": "Estimate tumor mutational burden from the total number of somatic mutations and target region size, default: False",
+                    "fa_icon": "fab fa-tumblr"
                 },
-                "new_param_26": {
-                    "type": "string"
+                "estimate_msi_status": {
+                    "type": "boolean",
+                    "description": "Predict microsatellite instability status from patterns of somatic mutations/indels, default: False",
+                    "fa_icon": "fab fa-tumblr"
                 },
-                "new_param_25": {
-                    "type": "string"
+                "tmb_algorithm": {
+                    "type": "string",
+                    "description": "Method for calculation of TMB, all coding variants (Chalmers et al., Genome Medicine, 2017), or non-synonymous variants only, default: all_coding",
+                    "default": "all_coding",
+                    "pattern": "^((all_coding|nonsyn)*,?)*$",
+                    "enum": [
+                        "all_coding",
+                        "nonsyn"
+                    ],
+                    "fa_icon": "fab fa-tumblr"
                 },
-                "new_param_24": {
-                    "type": "string"
+                "estimate_signatures": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-signature",
+                    "description": "Estimate relative contributions of reference mutational signatures in query sample and detect potential kataegis events, default: False"
                 },
-                "new_param_23": {
-                    "type": "string"
+                "min_mutations_signatures": {
+                    "type": "number",
+                    "fa_icon": "fas fa-signature",
+                    "description": "Minimum number of SNVs required for reconstruction of mutational signatures (SBS) by MutationalPatterns (default: 200, minimum n = 100)",
+                    "default": 200,
+                    "minimum": 100,
+                    "maximum": 1000
                 },
-                "new_param_22": {
-                    "type": "string"
+                "all_reference_signatures": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-signature",
+                    "description": "Use all reference mutational signatures (SBS, n = 67) in signature reconstruction rather than only those already attributed to the tumor type (default: False)"
                 },
-                "new_param_21": {
-                    "type": "string"
+                "include_artefect_signatures": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-signature",
+                    "description": "Include sequencing artefacts in the collection of reference signatures (default: False)"
                 },
-                "new_param_20": {
-                    "type": "string"
-                },
-                "new_param_19": {
-                    "type": "string"
-                },
-                "new_param_18": {
-                    "type": "string"
-                },
-                "new_param_17": {
-                    "type": "string"
-                },
-                "new_param_16": {
-                    "type": "string"
-                },
-                "new_param_15": {
-                    "type": "string"
+                "prevalence_reference_signatures": {
+                    "type": "number",
+                    "fa_icon": "fas fa-signature",
+                    "description": "Minimum tumor-type prevalence (in percent) of reference signatures to be included in refitting procedure (default: 5)",
+                    "default": 5,
+                    "minimum": 1,
+                    "maximum": 20,
+                    "enum": [
+                        1,
+                        2,
+                        5,
+                        10,
+                        15,
+                        20
+                    ]
                 }
             }
+        },
+        "pcgr_tumor_only_options": {
+            "title": "PCGR (Tumor-only) options",
+            "type": "object",
+            "description": "Parameters specific to tumor only mode.",
+            "default": "",
+            "properties": {
+                "tumor_only": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-id-card",
+                    "description": "Input VCF comes from tumor-only sequencing, calls will be filtered for variants of germline origin, (default: False)"
+                },
+                "cell_line": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-address-card",
+                    "description": "Input VCF comes from tumor cell line sequencing (requires --tumor_only), calls will be filtered for variants of germline origin, (default: False)"
+                },
+                "pon_vcf": {
+                    "type": "string",
+                    "fa_icon": "fas fa-address-card",
+                    "description": "VCF file with germline calls from Panel of Normals (PON) - i.e. blacklisted variants, (default: None)",
+                    "default": "null"
+                },
+                "exclude_pon": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-eye-slash",
+                    "description": "Exclude variants occurring in PoN (Panel of Normals, if provided as VCF (--pon_vcf), default: False)"
+                },
+                "exclude_likely_hom_germline": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-eye-slash",
+                    "description": "Exclude likely homozygous germline variants (100 pct allelic fraction for alternate allele in tumor, very unlikely somatic event, default: False)"
+                },
+                "exclude_likely_het_germline": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-eye-slash",
+                    "description": "Exclude likely heterozygous germline variants (40-60 pct allelic fraction, AND presence in dbSNP + gnomAD, AND not existing as somatic event in COSMIC/TCGA, default: False)"
+                },
+                "exclude_dbsnp_nonsomatic": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-eye-slash",
+                    "description": "Exclude variants found in dbSNP (only those that are NOT found in ClinVar(somatic origin)/DoCM/TCGA/COSMIC, defult: False)"
+                },
+                "exclude_nonexonic": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-eye-slash",
+                    "description": "Exclude non-exonic variants, (default: False)"
+                },
+                "maf_onekg_eur": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold (1000 Genomes Project - European pop, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_onekg_amr": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold (1000 Genomes Project - Ad mixed American pop, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_onekg_afr": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold (1000 Genomes Project - African pop, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_onekg_eas": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold (1000 Genomes Project -East Asian pop, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_onekg_sas": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold (1000 Genomes Project - South Asian pop, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_onekg_global": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold (1000 Genomes Project - Global pop, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_nfe": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - European (non-Finnish), default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_asj": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - Ashkenazi Jewish, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_fin": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - European (Finnish), default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_oth": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - Other, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_amr": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - Latino/Admixed American, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_afr": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - African/African-American, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_eas": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - East Asian, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_sas": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - South Asian, default: 0.002)",
+                    "default": 0.002
+                },
+                "maf_gnomad_global": {
+                    "type": "number",
+                    "fa_icon": "fas fa-globe-americas",
+                    "description": "Exclude variants in tumor (SNVs/InDels, tumor-only mode) with MAF above the given percent threshold, (gnomAD - global population, default: 0.002)",
+                    "default": 0.002
+                }
+            },
+            "fa_icon": "fas fa-address-card"
         },
         "input_output_options": {
             "title": "Input/output options",
@@ -159,7 +335,7 @@
         "global_options": {
             "title": "Global options",
             "type": "object",
-            "description": "High level parameters required for both PCGR and CSPR",
+            "description": "High level parameters for both PCGR and CSPR",
             "default": "",
             "properties": {
                 "mode": {
@@ -173,7 +349,8 @@
                     "type": "string",
                     "fa_icon": "fas fa-dna",
                     "description": "Genome assembly used to generate VCF files.",
-                    "help_text": "PCGR works on outputs of Sarek and as such, this parameter simply denotes the genome assembly build used (GRCh37/GRCh38). The workflow does not download any reference files from iGenomes. "
+                    "help_text": "PCGR works on outputs of Sarek and as such, this parameter simply denotes the genome assembly build used (GRCh37/GRCh38). The workflow does not download any reference files from iGenomes. ",
+                    "default": "grch37"
                 },
                 "database": {
                     "type": "string",
@@ -202,11 +379,13 @@
             "default": "",
             "properties": {
                 "panel_id": {
-                    "type": "integer",
+                    "type": "number",
                     "fa_icon": "fas fa-list-ol",
                     "description": "Select the virtual gene panel for cancer predisposition reports.",
                     "help_text": "Virtual panels derived from Genomics England PanelApp see https://sigven.github.io/cpsr/articles/virtual_panels.html for more information.\n\nN.B: Only used with --mode 'CPSR'",
-                    "default": 0
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 42
                 },
                 "diagnostic_grade_only": {
                     "type": "boolean",
@@ -287,7 +466,7 @@
                 },
                 "vep_no_intergenic": {
                     "type": "boolean",
-                    "fa_icon": "fas fa-exclamation-triangle",
+                    "fa_icon": "fas fa-eye-slash",
                     "description": "Skip intergenic variants during processing (option '--no_intergenic' in VEP), default: False"
                 }
             },
@@ -479,6 +658,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/pcgr_options"
+        },
+        {
+            "$ref": "#/definitions/pcgr_tumor_only_options"
         },
         {
             "$ref": "#/definitions/input_output_options"
