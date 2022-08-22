@@ -84,6 +84,33 @@
                     "description": "Estimated tumor ploidy (default: None)",
                     "default": "null"
                 },
+                "cna_analysis": {
+                    "type": "boolean",
+                    "fa_icon": "far fa-copy",
+                    "description": "Include somatic copy number alteration analysis.",
+                    "help_text": "The workflow will automatically parse Sarek CNA tools for compatibility with PCGR. Specify the file paths in your samplesheet using the column 'cna'.",
+                    "default": "false"
+                },
+                "logr_gain": {
+                    "type": "number",
+                    "fa_icon": "far fa-copy",
+                    "default": 0.8,
+                    "description": "Log ratio-threshold (minimum) for segments containing copy number gains/amplifications (default: 0.8)"
+                },
+                "logr_homdel": {
+                    "type": "number",
+                    "fa_icon": "far fa-copy",
+                    "description": "Log ratio-threshold (maximum) for segments containing homozygous deletions (default: -0.8)",
+                    "default": -0.8
+                },
+                "cna_overlap_pct": {
+                    "type": "number",
+                    "fa_icon": "far fa-copy",
+                    "description": "Mean percent overlap between copy number segment and gene transcripts for reporting of gains/losses in tumor suppressor genes/oncogenes, (default: 50)",
+                    "default": 50,
+                    "minimum": 0,
+                    "maximum": 100
+                },
                 "targte_size_mb": {
                     "type": "number",
                     "fa_icon": "fab fa-tumblr",
@@ -149,6 +176,11 @@
                         15,
                         20
                     ]
+                },
+                "include_trials": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-chart-line",
+                    "description": "Include relevant ongoing or future clinical trials, focusing on studies with molecularly targeted interventions"
                 }
             }
         },

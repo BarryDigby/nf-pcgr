@@ -15,7 +15,7 @@
 // TODO nf-core: Optional inputs are not currently supported by Nextflow. However, using an empty
 //               list (`[]`) instead of a file can be used to work around this issue.
 
-process PCGR {
+process CPSR {
     tag "$meta.id"
     label 'process_low'
 
@@ -25,7 +25,8 @@ process PCGR {
         'docker.io/sigven/pcgr:1.0.3' }"
 
     input:
-    tuple val(meta), path(vcf), path(tbi), path(cna)
+    // tuple [ meta, [vcf] , [vcf.tbi] ]
+    tuple val(meta), path(vcf), path(tbi)
 
     output:
     // TODO nf-core: Named file extensions MUST be emitted for ALL output channels
@@ -40,7 +41,6 @@ process PCGR {
     def genome   = task.ext.genome ?: ''
     def database = task.ext.database ?: ''
     def prefix   = task.ext.prefix ?: "${meta.id}"
-    def cna      = params.cna_analysis ? "--input_cna $cna" : ''
     def args     = task.ext.args ?: ''
     // TODO nf-core: It MUST be possible to pass additional parameters to the tool as a command-line string via the "task.ext.args" directive
     // TODO nf-core: If the tool supports multi-threading then you MUST provide the appropriate parameter
@@ -48,13 +48,12 @@ process PCGR {
     """
     mkdir -p $prefix
 
-    pcgr \\
+    cpsr \\
         --input_vcf $vcf \\
         --pcgr_dir $database \\
         --output_dir $prefix \\
         --genome_assembly $genome \\
         --sample_id $prefix \\
-        $cna \\
         $args
 
     cat <<-END_VERSIONS > versions.yml
