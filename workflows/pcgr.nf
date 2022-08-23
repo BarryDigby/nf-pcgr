@@ -60,9 +60,11 @@ workflow PCGR {
 
     INPUT_CHECK.out.files.view()
 
-    RUN_PCGR(
-        INPUT_CHECK.out.files
-    )
+    if(params.mode.toLowerCase() == 'pcgr') RUN_PCGR( INPUT_CHECK.out.files )
+
+    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.files )
+
+    RUN_CPSR.out.cpsr_reports.view()
 }
 
 /*

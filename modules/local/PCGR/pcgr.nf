@@ -32,6 +32,7 @@ process PCGR {
     //tuple val(meta), path("*.bam"), emit: bam
     // TODO nf-core: List additional required output channels/values here
     path "versions.yml"           , emit: versions
+    tuple val(meta), path("${meta.id}"), emit: pcgr_reports
 
     when:
     task.ext.when == null || task.ext.when
