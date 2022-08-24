@@ -1,10 +1,3 @@
-//
-// Check input and get vcf channels
-// Sarek outputs VCF files in the form of:
-// ${meta.id}.{tool}.vcf.gz..
-// 'simpleName' should suffice here.
-// Allow file or path as input, automatically check if VCF files are indexed
-//
 
 workflow INPUT_CHECK {
     take:

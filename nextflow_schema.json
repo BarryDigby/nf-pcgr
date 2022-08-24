@@ -30,6 +30,13 @@
                     "fa_icon": "fas fa-paste",
                     "description": "CPSR report file (Gzipped JSON  -  germline report of patient's blood/control sample"
                 },
+                "fasta": {
+                    "type": "string",
+                    "fa_icon": "fas fa-dna",
+                    "description": "Reference fasta file used in Sarek analysis.",
+                    "help_text": "Used to normalize variants using bcftools, does not have to be indexed. Check your chromosome ID's against your VCF files (chr1 vs. 1)",
+                    "default": "null"
+                },
                 "tumor_site": {
                     "type": "number",
                     "fa_icon": "fas fa-male",
@@ -181,6 +188,64 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-chart-line",
                     "description": "Include relevant ongoing or future clinical trials, focusing on studies with molecularly targeted interventions"
+                },
+                "tumor_dp_tag": {
+                    "type": "string",
+                    "fa_icon": "fas fa-tags",
+                    "description": "Specify VCF INFO tag for sequencing depth (tumor, must be Type=Integer, default: TDP)",
+                    "default": "TDP",
+                    "help_text": "The workflow attempts to automatically assign new VCF info and header fields denoting the sequencing depth for the tumor sample with the TDP tag. "
+                },
+                "tumor_af_tag": {
+                    "type": "string",
+                    "fa_icon": "fas fa-tags",
+                    "description": "Specify VCF INFO tag for variant allelic fraction (tumor,  must be Type=Float, default: TAF)",
+                    "default": "TAF",
+                    "help_text": "The workflow attempts to automatically assign new VCF info and header fields denoting the variant allelic fraction for the tumor sample with the TAF tag. "
+                },
+                "control_dp_tag": {
+                    "type": "string",
+                    "fa_icon": "fas fa-tag",
+                    "description": "Specify VCF INFO tag for sequencing depth (control, must be Type=Integer, default: NDP)",
+                    "default": "NDP",
+                    "help_text": "The workflow attempts to automatically assign new VCF info and header fields denoting the sequencing depth for the normal sample with the NDP tag. "
+                },
+                "control_af_tag": {
+                    "type": "string",
+                    "fa_icon": "fas fa-tag",
+                    "description": "Specify VCF INFO tag for variant allelic fraction (control, must be Type=Float, default: NAF)",
+                    "default": "NAF",
+                    "help_text": "The workflow attempts to automatically assign new VCF info and header fields denoting the variant allelic fraction for the normal sample with the NAF tag. "
+                },
+                "conf_call_tag": {
+                    "type": "string",
+                    "fa_icon": "fas fa-tag",
+                    "description": "Specify VCF INFO tag for somatic variant call confidence (must be categorical, e.g. Type=String, default: _NA_)",
+                    "help_text": "BETA: the workflow will attempt to determine consensus calls of variants i.e mutect2,freebayes,manta denotes the variant was called by three tools. "
+                },
+                "tumor_dp_min": {
+                    "type": "number",
+                    "fa_icon": "fas fa-sort-amount-down",
+                    "description": "If VCF INFO tag for sequencing depth (tumor) is specified and found, set minimum required depth for inclusion in report (default: 0)",
+                    "default": 0
+                },
+                "tumor_af_min": {
+                    "type": "number",
+                    "fa_icon": "fas fa-sort-amount-down",
+                    "description": "If VCF INFO tag for variant allelic fraction (tumor) is specified and found, set minimum required AF for inclusion in report (default: 0)",
+                    "default": 0
+                },
+                "control_dp_min": {
+                    "type": "number",
+                    "fa_icon": "fas fa-sort-amount-down",
+                    "description": "If VCF INFO tag for sequencing depth (control) is specified and found, set minimum required depth for inclusion in report (default: 0)",
+                    "default": 0
+                },
+                "control_af_max": {
+                    "type": "number",
+                    "fa_icon": "fas fa-sort-amount-down",
+                    "description": "If VCF INFO tag for variant allelic fraction (control) is specified and found, set maximum tolerated AF for inclusion in report (default: 1)",
+                    "default": 1
                 }
             }
         },

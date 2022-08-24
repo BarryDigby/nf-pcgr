@@ -11,8 +11,9 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 def checkPathParamList = [ params.input ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
-// Input can be a file or a path
+// Stage
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+if (params.mode.toLowerCase() == 'pcgr') { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) } else { exit 1, 'PCGR chosen but no FASTA file provided' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -24,8 +25,10 @@ if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input sample
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { PCGR as RUN_PCGR } from '../modules/local/PCGR/pcgr' // cant have same name as workflows above?
-include { CPSR as RUN_CPSR } from '../modules/local/PCGR/cpsr'
+include { FORMAT_VCF  } from '../subworkflows/local/format_vcf'
+
+include { PCGR as RUN_PCGR } from '../modules/local/PCGR/Run/pcgr' // cant have same name as workflows above?
+include { CPSR as RUN_CPSR } from '../modules/local/PCGR/Run/cpsr'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,20 +54,25 @@ workflow PCGR {
 
     ch_versions = Channel.empty()
 
-    //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
+    // Read samplesheet, create channel with meta.id, vcf, vcf_tbi, cna file
     INPUT_CHECK (
         ch_input
     )
 
-    INPUT_CHECK.out.files.view()
+    // Automatically add INFO and HEADER fields to somatic VCF files
+    // RUN PCGR after.
+    if(params.mode.toLowerCase() == 'pcgr'){
+        FORMAT_VCF(
+            ch_fasta, INPUT_CHECK.out.files
+        )
 
-    if(params.mode.toLowerCase() == 'pcgr') RUN_PCGR( INPUT_CHECK.out.files )
+        RUN_PCGR(
+            FORMAT_VCF.out.files
+        )
+    }
 
-    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.files )
+   if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.files )
 
-    RUN_CPSR.out.cpsr_reports.view()
 }
 
 /*
