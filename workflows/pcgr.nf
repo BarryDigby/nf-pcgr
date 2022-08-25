@@ -24,8 +24,8 @@ if (params.mode.toLowerCase() == 'pcgr') { ch_fasta = Channel.fromPath(params.fa
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check'
-include { FORMAT_VCF  } from '../subworkflows/local/format_vcf'
+include { INPUT_CHECK   } from '../subworkflows/local/input_check'
+include { FORMAT_FILES  } from '../subworkflows/local/format_files'
 
 include { PCGR as RUN_PCGR } from '../modules/local/PCGR/Run/pcgr' // cant have same name as workflows above?
 include { CPSR as RUN_CPSR } from '../modules/local/PCGR/Run/cpsr'
@@ -60,9 +60,10 @@ workflow PCGR {
     )
 
     // Automatically add INFO and HEADER fields to somatic VCF files
-    // RUN PCGR after.
+    // Detect CNA tool used and format for PCGR
+    // RUN PCGR
     if(params.mode.toLowerCase() == 'pcgr'){
-        FORMAT_VCF(
+        FORMAT_FILES(
             ch_fasta, INPUT_CHECK.out.files
         )
 

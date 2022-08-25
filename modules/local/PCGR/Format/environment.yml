@@ -9,3 +9,4 @@ dependencies:
  - bcftools
  - pip:
    - pysam
+   - pandas
