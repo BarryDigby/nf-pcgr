@@ -14,19 +14,22 @@ def reformat_cna(cna_file, sample):
     final_columns = ['Sample', 'Chromosome', 'Start', 'End', 'Num_Probes', 'Segment_Mean']
 
     # Stage file and guess tool
-    df = pd.read_csv(cna_file, sep="\t")
+    df = pd.read_csv(cna_file, delim_whitespace=True)
     tool = guess_tool(df)
 
     # Log info
     print(f"Reading {cna_file} file.\n\nProcessing {len(df.index) -1} lines.\nCNA tool used:\n>{tool}\n")
 
-    # Subset columns corresponding to expected PCGR input.
-    index = index_keys[tool]
-    df = df[df.columns.intersection(index)]
+    # Skip if test-dataset
+    if tool != 'pcgr':
 
-    # Insert 'Sample' columns and rename cols
-    df.insert(0, "Sample", sample)
-    df.set_axis(final_columns, 1, inplace=True)
+        # Subset columns corresponding to expected PCGR input.
+        index = index_keys[tool]
+        df = df[df.columns.intersection(index)]
+
+        # Insert 'Sample' columns and rename cols
+        df.insert(0, "Sample", sample)
+        df.set_axis(final_columns, 1, inplace=True)
 
     # output TSV
     out = sample + "." + tool + '.tsv'
@@ -35,9 +38,14 @@ def reformat_cna(cna_file, sample):
 def guess_tool(df):
     """
     Mainly for indexing, posterity by adding tool name to filename.
+    'pcgr': only likely to occur using test data provided by PCGR
+            i.e when using a test-dataset.
     """
 
-    tool_keys = { "cnvkit": ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'probes', 'weight', 'ci_lo', 'ci_hi']}
+    tool_keys = {
+        "pcgr":   ['Sample', 'Chromosome', 'Start', 'End', 'Num_Probes', 'Segment_Mean'],
+        "cnvkit": ['chromosome', 'start', 'end', 'gene', 'log2', 'depth', 'probes', 'weight', 'ci_lo', 'ci_hi']
+        }
 
     # subset list preferred (returns string) to list comprehension which returns a set.
     tool = list(tool_keys.keys())[list(tool_keys.values()).index(list(df.axes[1]))]
