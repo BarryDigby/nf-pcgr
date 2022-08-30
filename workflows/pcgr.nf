@@ -27,7 +27,7 @@ if (params.mode.toLowerCase() == 'pcgr') { ch_fasta = Channel.fromPath(params.fa
 include { INPUT_CHECK   } from '../subworkflows/local/input_check'
 include { FORMAT_FILES  } from '../subworkflows/local/format_files'
 
-include { PCGR as RUN_PCGR } from '../modules/local/PCGR/Run/pcgr' // cant have same name as workflows above?
+include { PCGR as RUN_PCGR } from '../modules/local/PCGR/Run/pcgr'
 include { CPSR as RUN_CPSR } from '../modules/local/PCGR/Run/cpsr'
 
 /*

@@ -8,11 +8,40 @@ workflow INPUT_CHECK {
 
     main:
     check_input(samplesheet)
-    TABIX_BGZIPTABIX( files.map{ meta, vcf, tbi, cna -> [meta, vcf]} )
 
+    TABIX_BGZIPTABIX( files.map{ meta, vcf, tbi, cna -> [meta, vcf]} )
+    TABIX_TABIX( files.map{ meta, vcf, tbi, cna -> [meta, vcf]} )
+
+    ch_tabix_bgzip = TABIX_BGZIPTABIX.out.gz_tbi.ifEmpty([])
+    ch_tabix_tabix = TABIX_TABIX.out.tbi.ifEmpty([])
+
+
+    // Mix channels, group by meta.id, flatten to remove [] introduced by ifEmpty
+    // collate 4 (meta, vcf, tbi, cna), remove metadata associated with tabix.
+    if (params.cna_analysis){
+        ch_files = files.mix(ch_tabix_bgzip, ch_tabix_tabix)
+                        .groupTuple(by: [0,0])
+                        .flatten()
+                        .collate( 4, false)
+                        .map{ meta, vcf, tbi, cna ->
+                                var = [:]
+                                var.id = meta.id
+                                return [var, vcf, tbi, cna]
+                        }
+    }else{
+        ch_files = files.mix(ch_tabix_bgzip, ch_tabix_tabix)
+                        .groupTuple(by: [0,0])
+                        .flatten()
+                        .collate( 3, false)
+                        .map{ meta, vcf, tbi ->
+                                var = [:]
+                                var.id = meta.id
+                                return [var, vcf, tbi, [] ]
+                        }
+    }
 
     emit:
-    files  // channel: [ val(meta), [ vcf.gz] , [ vcf.gz.tbi ] ] OR [ val(meta), [vcf.gz], [vcf.gz.tbi], [CNA] ]
+    ch_files  // channel: [ [meta:id], vcf.gz, vcf.gz.tbi, [] ] OR [ [meta:id], vcf.gz, vcf.gz.tbi, CNA ]
 }
 
 def check_input(input){
@@ -68,7 +97,7 @@ def check_input(input){
                 tbi  = vcf.toString() + '.tbi'
                 if(!file(tbi).exists()){
                     log.warn("The input VCF file '${vcf}' is not tabix indexed.")
-                    meta.tbi_vcf = true
+                    meta.tabix_vcf = true
                     tbi = []
                 }else{
                     tbi = [ file(tbi) ]
@@ -105,5 +134,5 @@ def check_input(input){
                 return  [ meta, [ file(vcf) ], tbi   ]
             }
         }
-        .set { files }
+        .set{ files }
 }
