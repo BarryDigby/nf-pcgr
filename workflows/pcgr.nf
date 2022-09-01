@@ -12,8 +12,9 @@ def checkPathParamList = [ params.input ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Stage
+//println(params.mode.toLowerCase())
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
-if (params.mode.toLowerCase() == 'pcgr') { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) } else { exit 1, 'PCGR chosen but no FASTA file provided' }
+//if (params.mode.toLowerCase() == 'pcgr') { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) } else { exit 1, 'PCGR chosen but no FASTA file provided' }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,17 +63,17 @@ workflow PCGR {
     // Automatically add INFO and HEADER fields to somatic VCF files
     // Detect CNA tool used and format for PCGR
     // RUN PCGR
-    //if(params.mode.toLowerCase() == 'pcgr'){
-    //    FORMAT_FILES(
-    //        ch_fasta, INPUT_CHECK.out.files
-    //    )
+    if(params.mode.toLowerCase() == 'pcgr'){
+        FORMAT_FILES(
+            ch_fasta, INPUT_CHECK.out.ch_files
+        )
 
-    //   RUN_PCGR(
-    //        FORMAT_VCF.out.files
-    //    )
-    //}
+       RUN_PCGR(
+            FORMAT_VCF.out.files
+        )
+    }
 
-   //if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.files )
+   if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files )
 
 }
 
