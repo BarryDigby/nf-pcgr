@@ -68,8 +68,8 @@ workflow PCGR {
             ch_fasta, INPUT_CHECK.out.ch_files
         )
 
-       RUN_PCGR(
-            FORMAT_VCF.out.files
+        RUN_PCGR(
+            FORMAT_FILES.out.files
         )
     }
 
