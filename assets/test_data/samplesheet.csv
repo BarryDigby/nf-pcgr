@@ -1,2 +1,2 @@
-vcf,cna
-https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/test.vcf,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/test.cna.tsv
+sample,vcf,cna
+HWI-ST807_461_C2P0JACXX_6_GCCAAT,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/test.vcf,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/test.cna.tsv

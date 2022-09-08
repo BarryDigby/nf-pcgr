@@ -82,6 +82,16 @@ def check_input(input){
     Channel.from(input).splitCsv(header:true, sep:',')
         .map{ row ->
 
+            // Check that sample column exists in samplesheet
+            if (row.sample) sample = row.sample
+            else sample = 'NA'
+
+            // Exit and tell user to add Sample column to samplesheet
+            if(sample == 'NA'){
+                log.error("ERROR: Your input file '(${input})'' does not have a 'sample' column.\n\nYou must add a 'sample' column in the samplesheet denoting the sample ID.")
+                System.exit(1)
+            }
+
             // Check if the VCF column exists in samplesheet
             if (row.vcf) vcf = file(row.vcf)
             else vcf = 'NA'
@@ -101,7 +111,7 @@ def check_input(input){
                 // Capture sample ID
                 def meta = [:]
                 vcf      = file(row.vcf)
-                meta.id  = vcf.simpleName
+                meta.id  = sample
 
                 // Check if the VCF file is bgzipped
                 if(!vcf.toString().endsWith('.gz') && vcf.toString().endsWith('.vcf')){
