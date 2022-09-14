@@ -75,9 +75,11 @@ def reformat_vcf(vcf_file, out, reference):
         if 'strelka' in fnc_str:
             header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
         with VariantFile(out, 'w', header=header) as fw:
+            tumor_is_first = 0
+            tumor_is_second = 0
             for record in fr:
-                VAF_sample0 = locals()[fnc_str](record, 0)
-                VAF_sample1 = locals()[fnc_str](record, 1)
+                VAF_sample0 = globals()[fnc_str](record, 0)
+                VAF_sample1 = globals()[fnc_str](record, 1)
                 if VAF_sample0 > VAF_sample1:
                     tumor_is_first += 1
                 else:
@@ -88,9 +90,9 @@ def reformat_vcf(vcf_file, out, reference):
                 record.info['NDP'] = record.samples[normal_idx]['DP']
                 record.info['TAF'] = round(record.samples[tumor_idx]['AD'][1]/record.samples[tumor_idx]['DP'], 3)
                 record.info['NAF'] = round(record.samples[normal_idx]['AD'][1]/record.samples[normal_idx]['DP'], 3)
-                print(record)
                 fw.write(record)
 
+    print(f'we guess tumor sample is {samples[tumor_idx]} ')
     os.remove('tmp_.vcf')
     os.system(f'bgzip {out}')
     os.system(f'tabix {out}.gz')
