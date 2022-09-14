@@ -54,10 +54,8 @@ vcf_formats = { "mutect2_vaf": ['AD', 'AF', 'DP', 'F1R2', 'F2R1', 'FAD', 'GQ', '
                 "strelka_indel_vaf": ['BCN50', 'DP', 'DP2', 'DP50', 'FDP50', 'SUBDP50', 'TAR', 'TIR', 'TOR'] }
 
 
-
-
-
-
+#####################################################################################################################
+#####################################################################################################################
 
 def reformat_vcf(vcf_file, out, reference):
     """
@@ -96,3 +94,7 @@ def reformat_vcf(vcf_file, out, reference):
     os.remove('tmp_.vcf')
     os.system(f'bgzip {out}')
     os.system(f'tabix {out}.gz')
+
+if __name__ == '__main__':
+    from xcmds import xcmds
+    xcmds.xcmds(locals())
