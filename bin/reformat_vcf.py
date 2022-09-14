@@ -5,44 +5,6 @@ import os
 # https://github.com/sigven/pcgr/issues/136#issuecomment-919273152
 # Built upon by @BarryDigby to handle Strelka, Freebayes, Mutect2 VCF files.
 
-def reformat_vcf(vcf_file, out, reference):
-    """
-    BCFtools: split multi-allelic sites, normalize and remove sites where DP is missing or < 1. (divide by zero errors).
-    Calculations need to be cross checked with someone with more experience in population genomics.
-    """
-    os.system(f'bcftools norm -f {reference} -m -both {vcf_file} | bcftools filter -e\'FORMAT/DP="." || FORMAT/DP<1\' -o tmp_.vcf')
-    with VariantFile('tmp_.vcf') as fr:
-        header = fr.header
-        header.info.add('TDP', number=1, type='Integer', description='Tumor sample depth')
-        header.info.add('NDP', number=1, type='Integer', description='Normal sample depth')
-        header.info.add('TAF', number=1, type='Float', description='Tumor sample AF')
-        header.info.add('NAF', number=1, type='Float', description='Normal sample AF')
-        samples = list(header.samples)
-        formats = list(header.formats)
-        fnc_str = list(vcf_formats.keys())[list(vcf_formats.values()).index(list(formats))]
-        if 'strelka' in fnc_str:
-            header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
-        with VariantFile(out, 'w', header=header) as fw:
-            for record in fr:
-                VAF_sample0 = locals()[fnc_str](record, 0)
-                VAF_sample1 = locals()[fnc_str](record, 1)
-                if VAF_sample0 > VAF_sample1:
-                    tumor_is_first += 1
-                else:
-                    tumor_is_second += 1
-                tumor_idx = tumor_is_second >= tumor_is_first
-                normal_idx = 1 - tumor_idx
-                record.info['TDP'] = record.samples[tumor_idx]['DP']
-                record.info['NDP'] = record.samples[normal_idx]['DP']
-                record.info['TAF'] = round(record.samples[tumor_idx]['AD'][1]/record.samples[tumor_idx]['DP'], 3)
-                record.info['NAF'] = round(record.samples[normal_idx]['AD'][1]/record.samples[normal_idx]['DP'], 3)
-                print(record)
-                fw.write(record)
-
-    os.remove('tmp_.vcf')
-    os.system(f'bgzip {out}')
-    os.system(f'tabix {out}.gz')
-
 def mutect2_vaf(record, sample_idx):
     VAF = record.samples[sample_idx]['AF'][0]
     VAF = VAF if VAF is not None else 0
@@ -86,8 +48,51 @@ def strelka_indel_vaf(record, sample_idx):
     record.samples[sample_idx]['AD'] = [0, tier1AltCounts]
     return VAF
 
-
 vcf_formats = { "mutect2_vaf": ['AD', 'AF', 'DP', 'F1R2', 'F2R1', 'FAD', 'GQ', 'GT', 'PGT', 'PID', 'PL', 'PS', 'SB'],
                 "freebayes_vaf": ['AD', 'AO', 'DP', 'GL', 'GQ', 'GT', 'MIN_DP', 'PL', 'QA', 'QR', 'RO'],
                 "strelka_snv_vaf": ['AU', 'CU', 'DP', 'FDP', 'GU', 'SDP', 'SUBDP', 'TU'],
                 "strelka_indel_vaf": ['BCN50', 'DP', 'DP2', 'DP50', 'FDP50', 'SUBDP50', 'TAR', 'TIR', 'TOR'] }
+
+
+
+
+
+
+
+def reformat_vcf(vcf_file, out, reference):
+    """
+    BCFtools: split multi-allelic sites, normalize and remove sites where DP is missing or < 1. (divide by zero errors).
+    Calculations need to be cross checked with someone with more experience in population genomics.
+    """
+    os.system(f'bcftools norm -f {reference} -m -both {vcf_file} | bcftools filter -e\'FORMAT/DP="." || FORMAT/DP<1\' -o tmp_.vcf')
+    with VariantFile('tmp_.vcf') as fr:
+        header = fr.header
+        header.info.add('TDP', number=1, type='Integer', description='Tumor sample depth')
+        header.info.add('NDP', number=1, type='Integer', description='Normal sample depth')
+        header.info.add('TAF', number=1, type='Float', description='Tumor sample AF')
+        header.info.add('NAF', number=1, type='Float', description='Normal sample AF')
+        samples = list(header.samples)
+        formats = list(header.formats)
+        fnc_str = list(vcf_formats.keys())[list(vcf_formats.values()).index(list(formats))]
+        if 'strelka' in fnc_str:
+            header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
+        with VariantFile(out, 'w', header=header) as fw:
+            for record in fr:
+                VAF_sample0 = locals()[fnc_str](record, 0)
+                VAF_sample1 = locals()[fnc_str](record, 1)
+                if VAF_sample0 > VAF_sample1:
+                    tumor_is_first += 1
+                else:
+                    tumor_is_second += 1
+                tumor_idx = tumor_is_second >= tumor_is_first
+                normal_idx = 1 - tumor_idx
+                record.info['TDP'] = record.samples[tumor_idx]['DP']
+                record.info['NDP'] = record.samples[normal_idx]['DP']
+                record.info['TAF'] = round(record.samples[tumor_idx]['AD'][1]/record.samples[tumor_idx]['DP'], 3)
+                record.info['NAF'] = round(record.samples[normal_idx]['AD'][1]/record.samples[normal_idx]['DP'], 3)
+                print(record)
+                fw.write(record)
+
+    os.remove('tmp_.vcf')
+    os.system(f'bgzip {out}')
+    os.system(f'tabix {out}.gz')
