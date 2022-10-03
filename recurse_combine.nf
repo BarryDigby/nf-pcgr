@@ -9,8 +9,8 @@ def collect_sarek_files(input){
     cna_files = []
     input.eachFileRecurse{ it ->
         vcf = it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ? file(it) : []
-        cna = it.name.endsWith('.cns') ? file(it) : params.cna_analysis ? [] : 'NA' // catch for sarek run without CNVkit results
-        ids = it.simpleName.tokenize('_')[0]
+        if(params.cna_analysis){ cna = it.name.contains('.cns') ? file(it) : [] }else{ cna = 'NA' }
+        ids = ( it.name.contains('.cns') || it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ) ? it.simpleName.tokenize('_')[0] : 'NA'
         vcf_files << [ ids, vcf ]
         cna_files << [ ids, cna ]
         }
@@ -20,8 +20,6 @@ def collect_sarek_files(input){
     }else{
         Channel.fromList( cna_files ).set{ collect_cna }
     }
-
-    collect_cna.view()
-    sarek_files = collect_vcf.combine(collect_cna, by:0)
+    sarek_files = collect_vcf.combine(collect_cna, by:0).unique()
     return sarek_files
 }
