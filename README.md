@@ -19,7 +19,7 @@
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
 
-**nf-core/pcgr** is a bioinformatics best-practice analysis pipeline for Downstream variant prioritisation using PCGR/CSPR designed to work off nf-core/sarek outputs. Not intended for nf-core, but could be a useful tool for downstream analysis and visualisation of sarek outputs.
+**nf-core/pcgr** is a bioinformatics best-practice analysis pipeline for downstream variant prioritisation using PCGR/CSPR designed to work off nf-core/sarek outputs.
 
 ### --pcgr_dir
 
