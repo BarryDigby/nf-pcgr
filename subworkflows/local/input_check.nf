@@ -55,7 +55,7 @@ workflow INPUT_CHECK {
                                 var.id = meta.id
                                 return [var, vcf, tbi ]
                         }
-    } // open to more elgant solutions to the if else statements above!
+    } // open to more elgant solutions to the if else statements above
 
     emit:
     ch_files  // channel: [ [meta:id], vcf.gz, vcf.gz.tbi, [] ] OR [ [meta:id], vcf.gz, vcf.gz.tbi, CNA ]
