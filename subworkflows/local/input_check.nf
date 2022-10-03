@@ -4,11 +4,22 @@ include { TABIX_BGZIPTABIX } from '../../modules/nf-core/modules/tabix/bgziptabi
 
 workflow INPUT_CHECK {
     take:
-    samplesheet // samplesheet file or path to VCF files
+     // samplesheet file or path to files accpeted
+    ch_input
 
     main:
-    check_input(samplesheet)
+    // Step 1.
+    // allow the user to provide a samplesheet, or path to sarek directory.
+    if( ch_input.toString().endsWith('.csv') ){
+        check_input(ch_input)
+    }else{
+        sarek_files = collect_sarek_files(ch_input)
+        sarek_files.collectFile( name: 'constructed_samplesheet.csv', newLine:false, storeDir: "${params.outdir}", keepHeader: true ){ ids, vcf, cna -> "sample,vcf,cna" + "\n" + "$ids,$vcf,$cna" + "\n"}.set{ constructed_samplesheet }
+        check_input(constructed_samplesheet)
+    }
 
+    // Step 2.
+    // Determine if vcf files need to be bgzipped and or tabixed.
     // 0: meta, 1: vcf, 2: tbi, 3: cna.
     // must use it instead of names here due to different input tuple len for modes.
     TABIX_BGZIPTABIX( files.map{ it -> [it[0], it[1]]} )
@@ -17,9 +28,11 @@ workflow INPUT_CHECK {
     ch_tabix_bgzip = TABIX_BGZIPTABIX.out.gz_tbi.ifEmpty([])
     ch_tabix_tabix = TABIX_TABIX.out.tbi.ifEmpty([])
 
+    // Step 3.
+    // Create channels for CPSR/PCGR. Requires some work as user may choose to omit cna analysis.
     // PCGR:
     // Mix channels, group by meta.id, flatten to remove [] introduced by ifEmpty
-    // collate 4 (meta, vcf, tbi, cna), remove metadata associated with tabix.
+    // collate 4 (meta, vcf, tbi, cna), remove metadata associated with tabix logic.
     if(params.mode.toLowerCase() == 'pcgr'){
         // CNA analysis dictates collate #
         if (params.cna_analysis){
@@ -163,3 +176,27 @@ def check_input(input){
         }
         .set{ files }
 }
+
+
+def collect_sarek_files(input){
+    vcf_files = []
+    cna_files = []
+    input.eachFileRecurse{ it ->
+        vcf = it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ? file(it) : []
+        cna = it.name.endsWith('.cns') ? file(it) : params.cna_analysis ? [] : 'NA' // catch for sarek run without CNVkit results
+        ids = it.simpleName.tokenize('_')[0]
+        vcf_files << [ ids, vcf ]
+        cna_files << [ ids, cna ]
+        }
+    Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }.set{ collect_vcf }
+    if(params.cna_analysis){
+        Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') }.set{ collect_cna }
+    }else{
+        Channel.fromList( cna_files ).set{ collect_cna }
+    }
+
+    collect_cna.view()
+    sarek_files = collect_vcf.combine(collect_cna, by:0)
+    return sarek_files
+}
+

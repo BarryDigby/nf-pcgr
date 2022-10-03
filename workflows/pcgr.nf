@@ -13,7 +13,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 
 // Stage
 //println(params.mode.toLowerCase())
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
+if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input file/directory does not exist!' }
 if (params.mode.toLowerCase() == 'pcgr') { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) }
 
 /*
@@ -55,7 +55,7 @@ workflow PCGR {
 
     ch_versions = Channel.empty()
 
-    // Read samplesheet, create channel with meta.id, vcf, vcf_tbi, cna file
+    // Read samplesheet/directory, create channel with meta.id, vcf, vcf_tbi, cna file
     INPUT_CHECK (
         ch_input
     )
