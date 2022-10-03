@@ -10,6 +10,7 @@ workflow INPUT_CHECK {
     main:
     // Step 1.
     // allow the user to provide a samplesheet, or path to sarek directory.
+    // Functions at end of file.
     if( ch_input.toString().endsWith('.csv') ){
         check_input(ch_input)
     }else{
@@ -177,26 +178,26 @@ def check_input(input){
         .set{ files }
 }
 
-
+// Important the user sets params.cna_analysis to false if CNVkit was not used in Sarek.
 def collect_sarek_files(input){
     vcf_files = []
     cna_files = []
     input.eachFileRecurse{ it ->
+        // match tumor vs normal VCF files
         vcf = it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ? file(it) : []
-        cna = it.name.endsWith('.cns') ? file(it) : params.cna_analysis ? [] : 'NA' // catch for sarek run without CNVkit results
-        ids = it.simpleName.tokenize('_')[0]
+        // Match CNVkit output file OR produce NA for samplesheet
+        if(params.cna_analysis){ cna = it.name.contains('.cns') ? file(it) : [] }else{ cna = 'NA' }
+        // Only grab IDs for VCF or CNVkit file, else NA
+        ids = ( it.name.contains('.cns') || it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ) ? it.simpleName.tokenize('_')[0] : 'NA'
+
         vcf_files << [ ids, vcf ]
         cna_files << [ ids, cna ]
         }
-    Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }.set{ collect_vcf }
-    if(params.cna_analysis){
-        Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') }.set{ collect_cna }
-    }else{
-        Channel.fromList( cna_files ).set{ collect_cna }
-    }
-
-    collect_cna.view()
-    sarek_files = collect_vcf.combine(collect_cna, by:0)
+    // Filter out the empty tuple slots '[]' in VCF array
+    collect_vcf = Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }
+    // As above, with catch for no CNVkit files.
+    collect_cna = params.cna_analysis ? Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') } : Channel.fromList( cna_files )
+    sarek_files = collect_vcf.combine(collect_cna, by:0).unique()
     return sarek_files
 }
 
