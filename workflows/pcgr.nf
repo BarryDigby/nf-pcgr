@@ -10,7 +10,7 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
-
+println(params.input)
 // Stage
 //println(params.mode.toLowerCase())
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input file/directory does not exist!' }

@@ -12,11 +12,19 @@ workflow INPUT_CHECK {
     // allow the user to provide a samplesheet, or path to sarek directory.
     // Functions at end of file.
     if( ch_input.toString().endsWith('.csv') ){
-        check_input(ch_input)
+        // ch_input is file(params.input)
+        samplesheet = Channel.of(ch_input)
+        check_input(samplesheet)
     }else{
+        // ch_input goes from 'file' (no channel) to channel containing constr samp file.
+        // use map to grab the file from the channel.
         sarek_files = collect_sarek_files(ch_input)
         sarek_files.collectFile( name: 'constructed_samplesheet.csv', newLine:false, storeDir: "${params.outdir}", keepHeader: true ){ ids, vcf, cna -> "sample,vcf,cna" + "\n" + "$ids,$vcf,$cna" + "\n"}.set{ constructed_samplesheet }
-        check_input(constructed_samplesheet)
+        samplesheet = constructed_samplesheet.map{ it ->
+                                                   samp_file = file(it)
+                                                   return samp_file }
+
+        check_input(samplesheet)
     }
 
     // Step 2.
@@ -37,7 +45,7 @@ workflow INPUT_CHECK {
     if(params.mode.toLowerCase() == 'pcgr'){
         // CNA analysis dictates collate #
         if (params.cna_analysis){
-            ch_files = files.mix(ch_tabix_bgzip, ch_tabix_tabix)
+            ch_files = files.mix(ch_tabix_bgzip, ch_tabix_tabix).view()
                             .groupTuple(by: [0,0])
                             .flatten()
                             .collate( 4, false)
@@ -93,7 +101,7 @@ def check_input(input){
     //    < when mode == 'cpsr' >
     //    a. Output empty channel for CNA
 
-    Channel.from(input).splitCsv(header:true, sep:',')
+    input.splitCsv(header:true, sep:',')
         .map{ row ->
 
             // Check that sample column exists in samplesheet
