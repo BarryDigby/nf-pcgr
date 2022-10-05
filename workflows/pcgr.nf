@@ -63,7 +63,7 @@ workflow PCGR {
     // Automatically add INFO and HEADER fields to somatic VCF files
     // Detect CNA tool used and format for PCGR
     // RUN PCGR
-    if(params.mode.toLowerCase() == 'pcgr'){
+/*     if(params.mode.toLowerCase() == 'pcgr'){
         FORMAT_FILES(
             ch_fasta, INPUT_CHECK.out.ch_files
         )
@@ -73,7 +73,7 @@ workflow PCGR {
         )
     }
 
-    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files )
+    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files ) */
 
 }
 

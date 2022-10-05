@@ -26,7 +26,7 @@ process CPSR {
 
     input:
     // tuple [ meta, [vcf] , [vcf.tbi] ]
-    tuple val(meta), path(vcf), path(tbi)
+    tuple val(meta), path(vcf), path(tbi), path(cna)
 
     output:
     // TODO nf-core: Named file extensions MUST be emitted for ALL output channels

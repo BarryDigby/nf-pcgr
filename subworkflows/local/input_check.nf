@@ -34,50 +34,36 @@ workflow INPUT_CHECK {
     TABIX_BGZIPTABIX( files.map{ it -> [it[0], it[1]]} )
     TABIX_TABIX( files.map{ it -> [it[0], it[1]]} )
 
+    // If procs were not run, flatten takes care of ifEmpty([]) in step below.
     ch_tabix_bgzip = TABIX_BGZIPTABIX.out.gz_tbi.ifEmpty([])
     ch_tabix_tabix = TABIX_TABIX.out.tbi.ifEmpty([])
 
     // Step 3.
-    // Create channels for CPSR/PCGR. Requires some work as user may choose to omit cna analysis.
-    // PCGR:
-    // Mix channels, group by meta.id, flatten to remove [] introduced by ifEmpty
-    // collate 4 (meta, vcf, tbi, cna), remove metadata associated with tabix logic.
-    if(params.mode.toLowerCase() == 'pcgr'){
-        // CNA analysis dictates collate #
-        if (params.cna_analysis){
-            ch_files = files.mix(ch_tabix_bgzip, ch_tabix_tabix).view()
-                            .groupTuple(by: [0,0])
-                            .flatten()
-                            .collate( 4, false)
-                            .map{ meta, vcf, tbi, cna ->
-                                    var = [:]
-                                    var.id = meta.id
-                                    return [var, vcf, tbi, cna]
-                            }
-        }else{
-            // No cna analysis, leave empty slot in tuple.
-            ch_files = files.mix(ch_tabix_bgzip, ch_tabix_tabix)
-                            .groupTuple(by: [0,0])
-                            .flatten()
-                            .collate( 3, false)
-                            .map{ meta, vcf, tbi ->
-                                    var = [:]
-                                    var.id = meta.id
-                                    return [var, vcf, tbi, [] ]
-                            }
-        }
+    // Using meta as the grouping key, combine the newly bgzipped/tabixed VCF files appropriately.
+    // Catch here is to remove the original raw VCF using flatten + filter. Restore tuple using collate.
+    // Made the decision to use the same input tuple for (!params.cna_analysis && params.mode = 'cpsr')
+    if(params.cna_analysis){
+        files.mix(ch_tabix_bgzip, ch_tabix_tabix)
+                .groupTuple(by: 0).view()
+                .flatten()
+                .filter{ it -> !it.toString().endsWith('.vcf')}
+                .collate(4, false)
+                .map{ meta, vcf, tbi, cna ->
+                      var = [:]
+                      var.id = meta.id
+                      return [var, vcf, tbi, cna]}.view()
     }else{
-        // CPSR mode, input tuple len = 3
-        ch_files = files.mix(ch_tabix_bgzip, ch_tabix_tabix)
-                        .groupTuple(by: [0,0])
-                        .flatten()
-                        .collate( 3, false)
-                        .map{ meta, vcf, tbi ->
-                                var = [:]
-                                var.id = meta.id
-                                return [var, vcf, tbi ]
-                        }
-    } // open to more elgant solutions to the if else statements above
+        files.mix(ch_tabix_bgzip, ch_tabix_tabix)
+                .groupTuple(by: 0)
+                .flatten()
+                .filter{ it -> !it.toString().endsWith('.vcf')}
+                .collate(3, false)
+                .map{ meta, vcf, tbi ->
+                      var = [:]
+                      var.id = meta.id
+                      return [var, vcf, tbi, [] ]}.view()
+    }
+
 
     emit:
     ch_files  // channel: [ [meta:id], vcf.gz, vcf.gz.tbi, [] ] OR [ [meta:id], vcf.gz, vcf.gz.tbi, CNA ]
@@ -135,10 +121,17 @@ def check_input(input){
                 vcf      = file(row.vcf)
                 meta.id  = sample
 
+                // Capture tool name (users must follow sarek naming conventions)
+                // This is crucial for properly combining the outputs of BGZIP/TABIX
+                filename = vcf.getName()
+                meta.tool = filename.toString().tokenize('.')[1]
+
                 // Check if the VCF file is bgzipped
                 if(!vcf.toString().endsWith('.gz') && vcf.toString().endsWith('.vcf')){
                     log.warn("The input VCF file '${vcf}' is not bgzipped.")
                     meta.bgzip_vcf = true
+                }else{
+                    meta.bgzip_vcf = false
                 }
 
                 // Check existence of TBI indexed VCF file (!presumed to be in the same directory!)
@@ -149,6 +142,7 @@ def check_input(input){
                     meta.tabix_vcf = true
                     tbi = []
                 }else{
+                    meta.tabix_vcf = false
                     tbi = [ file(tbi) ]
                 }
 
@@ -188,6 +182,7 @@ def check_input(input){
 
 // Important the user sets params.cna_analysis to false if CNVkit was not used in Sarek.
 def collect_sarek_files(input){
+    // Init empty array outside eachFileRecurse scope
     vcf_files = []
     cna_files = []
     input.eachFileRecurse{ it ->
@@ -197,11 +192,10 @@ def collect_sarek_files(input){
         if(params.cna_analysis){ cna = it.name.contains('.cns') ? file(it) : [] }else{ cna = 'NA' }
         // Only grab IDs for VCF or CNVkit file, else NA
         ids = ( it.name.contains('.cns') || it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ) ? it.simpleName.tokenize('_')[0] : 'NA'
-
         vcf_files << [ ids, vcf ]
         cna_files << [ ids, cna ]
         }
-    // Filter out the empty tuple slots '[]' in VCF array
+    // Filter out the empty tuple slots '[]' in VCF array i.e select appropriate files
     collect_vcf = Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }
     // As above, with catch for no CNVkit files.
     collect_cna = params.cna_analysis ? Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') } : Channel.fromList( cna_files )
