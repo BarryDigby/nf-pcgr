@@ -73,7 +73,7 @@ workflow PCGR {
         )
     }
 
-    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files ) */
+    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files )
 
 }
 

@@ -51,7 +51,7 @@ workflow INPUT_CHECK {
                 .map{ meta, vcf, tbi, cna ->
                       var = [:]
                       var.id = meta.id
-                      return [var, vcf, tbi, cna]}.view()
+                      return [var, vcf, tbi, cna]}.set{ ch_files }
     }else{
         files.mix(ch_tabix_bgzip, ch_tabix_tabix)
                 .groupTuple(by: 0)
@@ -61,7 +61,7 @@ workflow INPUT_CHECK {
                 .map{ meta, vcf, tbi ->
                       var = [:]
                       var.id = meta.id
-                      return [var, vcf, tbi, [] ]}.view()
+                      return [var, vcf, tbi, [] ]}.set{ ch_files }
     }
 
 
