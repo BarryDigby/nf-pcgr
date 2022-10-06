@@ -9,6 +9,7 @@ workflow FORMAT_FILES {
     main:
     FORMAT_VCF( fasta, files )
     FORMAT_CNA( FORMAT_VCF.out.files )
+    FORMAT_CNA.out.files.view()
 
     emit:
     files = params.cna_analysis ? FORMAT_CNA.out.files : FORMAT_VCF.out.files
