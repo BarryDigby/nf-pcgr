@@ -20,7 +20,7 @@ process PCGR {
     label 'process_low'
 
     conda (params.enable_conda ? "pcgr::pcgr=1.0.3" : null)
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+    container "${ workflow.containerEngine == 'singularity' && task.ext.singularity_pull_docker_container ?
         'docker.io/sigven/pcgr:1.0.3':
         'docker.io/sigven/pcgr:1.0.3' }"
 
