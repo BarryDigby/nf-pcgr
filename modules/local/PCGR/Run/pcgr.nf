@@ -12,7 +12,7 @@ process PCGR {
 
     output:
     path "versions.yml"           , emit: versions
-    tuple val(meta), path("${meta.id}"), emit: pcgr_reports
+    tuple val(meta), path("${prefix}"), emit: pcgr_reports
 
     when:
     task.ext.when == null || task.ext.when
@@ -20,7 +20,7 @@ process PCGR {
     script:
     def genome   = task.ext.genome ?: ''
     def database = task.ext.database ?: ''
-    def prefix   = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}.${meta.tool}"
     def cna      = params.cna_analysis ? "--input_cna $cna" : ''
     def args     = task.ext.args ?: ''
     """

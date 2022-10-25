@@ -65,7 +65,7 @@ workflow PCGR {
     // RUN PCGR
     if(params.mode.toLowerCase() == 'pcgr'){
         FORMAT_FILES(
-            ch_fasta, INPUT_CHECK.out.ch_files
+            ch_fasta.collect(), INPUT_CHECK.out.ch_files
         )
         FORMAT_FILES.out.files.view()
         RUN_PCGR(
