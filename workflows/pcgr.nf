@@ -67,7 +67,7 @@ workflow PCGR {
         FORMAT_FILES(
             ch_fasta, INPUT_CHECK.out.ch_files
         )
-
+        FORMAT_FILES.out.files.view()
         RUN_PCGR(
             FORMAT_FILES.out.files
         )

@@ -51,6 +51,7 @@ workflow INPUT_CHECK {
                 .map{ meta, vcf, tbi, cna ->
                       var = [:]
                       var.id = meta.id
+                      var.tool = meta.tool
                       return [var, vcf, tbi, cna]}.set{ ch_files }
     }else{
         files.mix(ch_tabix_bgzip, ch_tabix_tabix)
@@ -61,6 +62,7 @@ workflow INPUT_CHECK {
                 .map{ meta, vcf, tbi ->
                       var = [:]
                       var.id = meta.id
+                      var.tool = meta.tool
                       return [var, vcf, tbi, [] ]}.set{ ch_files }
     }
 
