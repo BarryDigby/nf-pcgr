@@ -127,6 +127,7 @@ def check_input(input){
                 // This is crucial for properly combining the outputs of BGZIP/TABIX
                 filename = vcf.getName()
                 meta.tool = filename.toString().tokenize('.')[1]
+                if( meta.tool == 'strelka' ) { meta.tool = filename.tokenize('.')[1,2].join('.') }
 
                 // Check if the VCF file is bgzipped
                 if(!vcf.toString().endsWith('.gz') && vcf.toString().endsWith('.vcf')){
