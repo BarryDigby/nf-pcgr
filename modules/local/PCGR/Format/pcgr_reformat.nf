@@ -1,5 +1,5 @@
 process FORMAT_VCF {
-    tag "$meta.id"
+    tag "${meta.id}:${meta.tool}"
     label 'process_low'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -11,7 +11,7 @@ process FORMAT_VCF {
     tuple val(meta), path(vcf), path(tbi), path(cna)
 
     output:
-    tuple val(meta), path("${meta.id}.vcf.gz"), path("${meta.id}.vcf.gz.tbi"), path(cna), emit: files
+    tuple val(meta), path("${meta.id}.${meta.tool}.vcf.gz"), path("${meta.id}.${meta.tool}.vcf.gz.tbi"), path(cna), emit: files
 
     when:
     task.ext.when == null || task.ext.when
