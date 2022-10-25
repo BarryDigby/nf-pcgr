@@ -19,7 +19,7 @@ workflow INPUT_CHECK {
         // ch_input goes from 'file' (no channel) to channel containing constr samp file.
         // use map to grab the file from the channel.
         sarek_files = collect_sarek_files(ch_input)
-        sarek_files.collectFile( name: 'constructed_samplesheet.csv', newLine:false, storeDir: "${params.outdir}", keepHeader: true ){ ids, vcf, cna -> "sample,vcf,cna" + "\n" + "$ids,$vcf,$cna" + "\n"}.set{ constructed_samplesheet }
+        sarek_files.collectFile( name: 'constructed_samplesheet.csv', newLine:false, storeDir: "${params.outdir}/pipeline_info", keepHeader: true ){ ids, vcf, cna -> "sample,vcf,cna" + "\n" + "$ids,$vcf,$cna" + "\n"}.set{ constructed_samplesheet }
         samplesheet = constructed_samplesheet.map{ it ->
                                                    samp_file = file(it)
                                                    return samp_file }
