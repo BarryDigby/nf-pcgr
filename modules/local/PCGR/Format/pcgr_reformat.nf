@@ -11,13 +11,13 @@ process FORMAT_VCF {
     tuple val(meta), path(vcf), path(tbi), path(cna)
 
     output:
-    tuple val(meta), path("${meta.id}.${meta.tool}.vcf.gz"), path("${meta.id}.${meta.tool}.vcf.gz.tbi"), path(cna), emit: files
+    tuple val(meta), path("${prefix}.vcf.gz"), path("${prefix}.vcf.gz.tbi"), path(cna), emit: files
 
     when:
     task.ext.when == null || task.ext.when
 
     script:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    prefix = task.ext.prefix ?: "${meta.id}.${meta.tool}"
     """
     python3.6 "${projectDir}/bin/reformat_vcf.py" \
         reformat_vcf \
