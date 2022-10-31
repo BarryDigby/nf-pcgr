@@ -69,6 +69,7 @@ def reformat_vcf(vcf_file, out, reference):
         header.info.add('NDP', number=1, type='Integer', description='Normal sample depth')
         header.info.add('TAF', number=1, type='Float', description='Tumor sample AF')
         header.info.add('NAF', number=1, type='Float', description='Normal sample AF')
+        header.info.add('TAL', number='.', type='String', description='Algorithms that called the somatic mutation')
         samples = list(header.samples)
         formats = list(header.formats)
         fnc_str = list(vcf_formats.keys())[list(vcf_formats.values()).index(list(formats))]
