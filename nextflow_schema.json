@@ -178,7 +178,8 @@
                     "type": "string",
                     "fa_icon": "fas fa-tag",
                     "description": "Specify VCF INFO tag for somatic variant call confidence (must be categorical, e.g. Type=String, default: _NA_)",
-                    "help_text": "BETA: the workflow will attempt to determine consensus calls of variants i.e mutect2,freebayes,manta denotes the variant was called by three tools. "
+                    "default": "TAL",
+                    "help_text": "BETA: the workflow will attempt to determine consensus calls of variants i.e mutect2,freebayes,strelka denotes the variant was called by three tools. "
                 },
                 "tumor_dp_min": {
                     "type": "number",

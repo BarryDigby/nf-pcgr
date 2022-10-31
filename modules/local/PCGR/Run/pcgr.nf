@@ -20,9 +20,9 @@ process PCGR {
     script:
     def genome   = task.ext.genome ?: ''
     def database = task.ext.database ?: ''
+    def args     = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}.${meta.tool}"
     def cna      = params.cna_analysis ? "--input_cna $cna" : ''
-    def args     = task.ext.args ?: ''
     """
     mkdir -p $prefix
 
