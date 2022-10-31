@@ -2,10 +2,10 @@ process PCGR {
     tag "${meta.id}:${meta.tool}"
     label 'process_medium'
 
-    conda (params.enable_conda ? "pcgr::pcgr=1.0.3" : null)
+    conda (params.enable_conda ? "pcgr::pcgr=1.1.0" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'docker.io/sigven/pcgr:1.0.3':
-        'docker.io/sigven/pcgr:1.0.3' }"
+        'docker.io/sigven/pcgr:1.1.0':
+        'docker.io/sigven/pcgr:1.1.0' }"
 
     input:
     tuple val(meta), path(vcf), path(tbi), path(cna)
