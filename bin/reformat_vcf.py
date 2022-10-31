@@ -79,6 +79,8 @@ def reformat_vcf(vcf_file, out, reference):
         with VariantFile(out, 'w', header=header) as fw:
             tumor_is_first = 0
             tumor_is_second = 0
+            algorithm = fnc_str.split('_', 1)[0]
+            algorithm_code = 1 if algorithm == 'mutect2' else 2 if algorithm == 'freebayes' else 3
             for record in fr:
                 VAF_sample0 = globals()[fnc_str](record, 0)
                 VAF_sample1 = globals()[fnc_str](record, 1)
