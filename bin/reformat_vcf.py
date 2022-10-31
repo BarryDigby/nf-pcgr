@@ -72,6 +72,8 @@ def reformat_vcf(vcf_file, out, reference):
         samples = list(header.samples)
         formats = list(header.formats)
         fnc_str = list(vcf_formats.keys())[list(vcf_formats.values()).index(list(formats))]
+        # append after algorithm check
+        header.formats.add('AL', number='.', type='Integer', description='Codes for algorithms that produced the somatic call (1 = mutect2, 2 = freebayes, 3 = strelka)')
         if 'strelka' in fnc_str:
             header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
         with VariantFile(out, 'w', header=header) as fw:
@@ -90,6 +92,9 @@ def reformat_vcf(vcf_file, out, reference):
                 record.info['NDP'] = record.samples[normal_idx]['DP']
                 record.info['TAF'] = round(record.samples[tumor_idx]['AD'][1]/record.samples[tumor_idx]['DP'], 3)
                 record.info['NAF'] = round(record.samples[normal_idx]['AD'][1]/record.samples[normal_idx]['DP'], 3)
+                record.info['TAL'] = algorithm
+                record.samples[tumor_idx]['AL'] = algorithm_code
+                record.samples[normal_idx]['AL'] = algorithm_code
                 fw.write(record)
 
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
