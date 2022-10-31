@@ -174,7 +174,7 @@
                     "default": "NAF",
                     "help_text": "The workflow attempts to automatically assign new VCF info and header fields denoting the variant allelic fraction for the normal sample with the NAF tag. "
                 },
-                "conf_call_tag": {
+                "call_conf_tag": {
                     "type": "string",
                     "fa_icon": "fas fa-tag",
                     "description": "Specify VCF INFO tag for somatic variant call confidence (must be categorical, e.g. Type=String, default: _NA_)",
