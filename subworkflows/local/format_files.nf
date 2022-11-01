@@ -1,5 +1,5 @@
-include { FORMAT_VCF    } from '../../modules/local/PCGR/Format/pcgr_reformat'
-include { FORMAT_CNA    } from '../../modules/local/PCGR/Format/pcgr_reformat'
+include { FORMAT_VCF      } from '../../modules/local/PCGR/Format/pcgr_reformat'
+include { FORMAT_CNA      } from '../../modules/local/PCGR/Format/pcgr_reformat'
 
 workflow FORMAT_FILES {
     take:

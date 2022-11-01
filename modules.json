@@ -2,36 +2,41 @@
     "name": "nf-core/pcgr",
     "homePage": "https://github.com/nf-core/pcgr",
     "repos": {
-        "nf-core/modules": {
-            "git_url": "https://github.com/nf-core/modules.git",
+        "https://github.com/nf-core/modules.git": {
             "modules": {
-                "custom/dumpsoftwareversions": {
-                    "branch": "master",
-                    "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
-                },
-                "fastqc": {
-                    "branch": "master",
-                    "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
-                },
-                "gatk4/createsomaticpanelofnormals": {
-                    "branch": "master",
-                    "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
-                },
-                "gatk4/mutect2": {
-                    "branch": "master",
-                    "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
-                },
-                "multiqc": {
-                    "branch": "master",
-                    "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
-                },
-                "tabix/bgziptabix": {
-                    "branch": "master",
-                    "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
-                },
-                "tabix/tabix": {
-                    "branch": "master",
-                    "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                "nf-core": {
+                    "custom/dumpsoftwareversions": {
+                        "branch": "master",
+                        "git_sha": "8022c68e7403eecbd8ba9c49496f69f8c49d50f0"
+                    },
+                    "fastqc": {
+                        "branch": "master",
+                        "git_sha": "f6a11408536fbee6cbea1f5977605011873de3ca"
+                    },
+                    "gatk4/createsomaticpanelofnormals": {
+                        "branch": "master",
+                        "git_sha": "7578005a576f3ac1b0d4f10c037dde34cdedfb67"
+                    },
+                    "gatk4/mergevcfs": {
+                        "branch": "master",
+                        "git_sha": "7578005a576f3ac1b0d4f10c037dde34cdedfb67"
+                    },
+                    "gatk4/mutect2": {
+                        "branch": "master",
+                        "git_sha": "7578005a576f3ac1b0d4f10c037dde34cdedfb67"
+                    },
+                    "multiqc": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "tabix/bgziptabix": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    },
+                    "tabix/tabix": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905"
+                    }
                 }
             }
         }

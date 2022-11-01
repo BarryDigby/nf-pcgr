@@ -1,6 +1,6 @@
 
-include { TABIX_TABIX      } from '../../modules/nf-core/modules/tabix/tabix/main'
-include { TABIX_BGZIPTABIX } from '../../modules/nf-core/modules/tabix/bgziptabix/main'
+include { TABIX_TABIX      } from '../../modules/nf-core/tabix/tabix/main'
+include { TABIX_BGZIPTABIX } from '../../modules/nf-core/tabix/bgziptabix/main'
 
 workflow INPUT_CHECK {
     take:
