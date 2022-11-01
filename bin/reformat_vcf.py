@@ -1,5 +1,6 @@
 from pysam import VariantFile
 import os
+import time
 
 # Inspired by: @gudeqing
 # https://github.com/sigven/pcgr/issues/136#issuecomment-919273152
@@ -114,7 +115,10 @@ def reformat_vcf(vcf_file, out, reference):
                 f.close
 
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
-    os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
+    while not os.path.exists('bcftools_reheader.txt'):
+        sleep(10)
+    if os.path.isfile('bcftools_reheader.txt'):
+        os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
     #os.remove('tmp_.vcf')
     #os.remove('tmp_1.vcf')
     os.system(f'bgzip {out}')
