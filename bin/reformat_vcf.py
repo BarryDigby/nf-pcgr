@@ -62,6 +62,7 @@ def reformat_vcf(vcf_file, out, reference):
     """
     BCFtools: split multi-allelic sites, normalize and remove sites where DP is missing or < 1. (divide by zero errors).
     Calculations need to be cross checked with someone with more experience in population genomics.
+    BCFtools: reformatting sample names to NORMAL, TUMOR for downstream merging.
     """
     os.system(f'bcftools norm -f {reference} -m -both {vcf_file} | bcftools filter -e\'FORMAT/DP="." || FORMAT/DP<1\' -o tmp_.vcf')
     with VariantFile('tmp_.vcf') as fr:
@@ -116,6 +117,7 @@ def reformat_vcf(vcf_file, out, reference):
 
     time.sleep(10)
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
+    print(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
     os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
     #os.remove('tmp_.vcf')
     #os.remove('tmp_1.vcf')
