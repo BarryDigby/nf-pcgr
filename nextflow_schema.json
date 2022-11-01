@@ -31,7 +31,7 @@
                     "fa_icon": "fas fa-dna",
                     "description": "Reference fasta file used in Sarek analysis.",
                     "help_text": "Used to normalize variants using bcftools, does not have to be indexed. Check your chromosome ID's against your VCF files (chr1 vs. 1)",
-                    "default": "null"
+                    "default": null
                 },
                 "tumor_site": {
                     "type": "number",
@@ -50,20 +50,20 @@
                     "type": "string",
                     "fa_icon": "fas fa-filter",
                     "description": "Estimated tumor purity (between 0 and 1, (default: None)",
-                    "default": "null"
+                    "default": null
                 },
                 "tumor_ploidy": {
                     "type": "string",
                     "fa_icon": "fas fa-vials",
                     "description": "Estimated tumor ploidy (default: None)",
-                    "default": "null"
+                    "default": null
                 },
                 "cna_analysis": {
                     "type": "boolean",
                     "fa_icon": "far fa-copy",
                     "description": "Include somatic copy number alteration analysis.",
                     "help_text": "The workflow will automatically parse Sarek CNA tools for compatibility with PCGR. Specify the file paths in your samplesheet using the column 'cna'.",
-                    "default": "false"
+                    "default": false
                 },
                 "logr_gain": {
                     "type": "number",
@@ -94,11 +94,13 @@
                 "estimate_tmb": {
                     "type": "boolean",
                     "description": "Estimate tumor mutational burden from the total number of somatic mutations and target region size, default: False",
+                    "default": false,
                     "fa_icon": "fab fa-tumblr"
                 },
                 "estimate_msi_status": {
                     "type": "boolean",
                     "description": "Predict microsatellite instability status from patterns of somatic mutations/indels, default: False",
+                    "default": false,
                     "fa_icon": "fab fa-tumblr"
                 },
                 "tmb_algorithm": {
@@ -112,7 +114,8 @@
                 "estimate_signatures": {
                     "type": "boolean",
                     "fa_icon": "fas fa-signature",
-                    "description": "Estimate relative contributions of reference mutational signatures in query sample and detect potential kataegis events, default: False"
+                    "description": "Estimate relative contributions of reference mutational signatures in query sample and detect potential kataegis events, default: False",
+                    "default": false
                 },
                 "min_mutations_signatures": {
                     "type": "number",
@@ -125,12 +128,14 @@
                 "all_reference_signatures": {
                     "type": "boolean",
                     "fa_icon": "fas fa-signature",
-                    "description": "Use all reference mutational signatures (SBS, n = 67) in signature reconstruction rather than only those already attributed to the tumor type (default: False)"
+                    "description": "Use all reference mutational signatures (SBS, n = 67) in signature reconstruction rather than only those already attributed to the tumor type (default: False)",
+                    "default": false
                 },
                 "include_artefact_signatures": {
                     "type": "boolean",
                     "fa_icon": "fas fa-signature",
-                    "description": "Include sequencing artefacts in the collection of reference signatures (default: False)"
+                    "description": "Include sequencing artefacts in the collection of reference signatures (default: False)",
+                    "default": false
                 },
                 "prevalence_reference_signatures": {
                     "type": "number",
@@ -216,43 +221,50 @@
                 "tumor_only": {
                     "type": "boolean",
                     "fa_icon": "fas fa-id-card",
-                    "description": "Input VCF comes from tumor-only sequencing, calls will be filtered for variants of germline origin, (default: False)"
+                    "description": "Input VCF comes from tumor-only sequencing, calls will be filtered for variants of germline origin, (default: False)",
+                    "default": false
                 },
                 "cell_line": {
                     "type": "boolean",
                     "fa_icon": "fas fa-address-card",
-                    "description": "Input VCF comes from tumor cell line sequencing (requires --tumor_only), calls will be filtered for variants of germline origin, (default: False)"
+                    "description": "Input VCF comes from tumor cell line sequencing (requires --tumor_only), calls will be filtered for variants of germline origin, (default: False)",
+                    "default": false
                 },
                 "pon_vcf": {
                     "type": "string",
                     "fa_icon": "fas fa-address-card",
                     "description": "VCF file with germline calls from Panel of Normals (PON) - i.e. blacklisted variants, (default: None)",
-                    "default": "null"
+                    "default": null
                 },
                 "exclude_pon": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Exclude variants occurring in PoN (Panel of Normals, if provided as VCF (--pon_vcf), default: False)"
+                    "description": "Exclude variants occurring in PoN (Panel of Normals, if provided as VCF (--pon_vcf), default: False)",
+                    "default": false
                 },
                 "exclude_likely_hom_germline": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Exclude likely homozygous germline variants (100 pct allelic fraction for alternate allele in tumor, very unlikely somatic event, default: False)"
+                    "description": "Exclude likely homozygous germline variants (100 pct allelic fraction for alternate allele in tumor, very unlikely somatic event, default: False)",
+                    "default": false
                 },
                 "exclude_likely_het_germline": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Exclude likely heterozygous germline variants (40-60 pct allelic fraction, AND presence in dbSNP + gnomAD, AND not existing as somatic event in COSMIC/TCGA, default: False)"
+                    "description": "Exclude likely heterozygous germline variants (40-60 pct allelic fraction, AND presence in dbSNP + gnomAD, AND not existing as somatic event in COSMIC/TCGA, default: False)",
+                    "default": false
                 },
                 "exclude_dbsnp_nonsomatic": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Exclude variants found in dbSNP (only those that are NOT found in ClinVar(somatic origin)/DoCM/TCGA/COSMIC, defult: False)"
+                    "description": "Exclude variants found in dbSNP (only those that are NOT found in ClinVar(somatic origin)/DoCM/TCGA/COSMIC, defult: False)",
+                    "default": false
                 },
                 "exclude_nonexonic": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Exclude non-exonic variants, (default: False)"
+                    "description": "Exclude non-exonic variants, (default: False)",
+                    "default": false
                 },
                 "maf_onekg_eur": {
                     "type": "number",
@@ -415,12 +427,13 @@
                     "fa_icon": "fas fa-server",
                     "description": "Path to PCGR data bundle.",
                     "help_text": "The workflow is designed to use docker containers containing the data bundle (default parameter). In the event you use the workflow with conda, you will need to download the data bundle manually and specify its path using this parameter.",
-                    "default": "/opt/mambaforge/envs/pcgr/bin/data"
+                    "default": null
                 },
                 "no_vcf_validate": {
                     "type": "boolean",
                     "fa_icon": "fas fa-tasks",
-                    "description": "Skip validation of input VCF with Ensembl's vcf-validator, default: False"
+                    "description": "Skip validation of input VCF with Ensembl's vcf-validator, default: False",
+                    "default": false
                 }
             },
             "required": ["mode", "genome", "database"],
@@ -444,12 +457,14 @@
                 "diagnostic_grade_only": {
                     "type": "boolean",
                     "fa_icon": "fas fa-clinic-medical",
-                    "description": "For panel_id's 1-42 (Genomics England PanelApp) - consider genes with a GREEN status only, default: False"
+                    "description": "For panel_id's 1-42 (Genomics England PanelApp) - consider genes with a GREEN status only, default: False",
+                    "default": false
                 },
                 "ignore_noncoding": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Do not list non-coding variants in HTML report, default: False"
+                    "description": "Do not list non-coding variants in HTML report, default: False",
+                    "default": false
                 },
                 "pop_gnomad": {
                     "type": "string",
@@ -468,12 +483,14 @@
                 "classify_all": {
                     "type": "boolean",
                     "fa_icon": "fas fa-search-plus",
-                    "description": "Provide CPSR variant classifications (TIER 1-5) also for variants with exising ClinVar classifications in output TSV, default: False"
+                    "description": "Provide CPSR variant classifications (TIER 1-5) also for variants with exising ClinVar classifications in output TSV, default: False",
+                    "default": false
                 },
                 "clinvar_ignore_noncancer": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Ignore (exclude from report) ClinVar-classified variants reported only for phenotypes/conditions NOT related to cancer, default: False"
+                    "description": "Ignore (exclude from report) ClinVar-classified variants reported only for phenotypes/conditions NOT related to cancer, default: False",
+                    "default": false
                 }
             },
             "fa_icon": "fas fa-file-alt"
@@ -507,12 +524,13 @@
                     "type": "string",
                     "fa_icon": "fas fa-sort-amount-down-alt",
                     "description": "Comma-separated string of ordered transcript properties for primary variant pick                     ( option '--pick_order' in VEP), default: canonical,appris,biotype,ccds,rank,tsl,length,mane",
-                    "default": "'canonical,appris,biotype,ccds,rank,tsl,length,mane'"
+                    "default": "canonical,appris,biotype,ccds,rank,tsl,length,mane"
                 },
                 "vep_no_intergenic": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Skip intergenic variants during processing (option '--no_intergenic' in VEP), default: False"
+                    "description": "Skip intergenic variants during processing (option '--no_intergenic' in VEP), default: False",
+                    "default": false
                 }
             },
             "help_text": ""
