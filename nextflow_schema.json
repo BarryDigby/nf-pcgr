@@ -22,9 +22,10 @@
                     "enum": ["WGS", "WES", "TARGETED"]
                 },
                 "cpsr_report": {
-                    "type": "boolean",
+                    "type": "string",
                     "fa_icon": "fas fa-paste",
-                    "description": "CPSR report file (Gzipped JSON  -  germline report of patient's blood/control sample"
+                    "description": "CPSR report file (Gzipped JSON - file ending with 'cpsr.<genome_assembly>.json.gz' -  germline report of patient's blood/control sample",
+                    "default": null
                 },
                 "fasta": {
                     "type": "string",
