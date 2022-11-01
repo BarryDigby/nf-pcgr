@@ -1,5 +1,6 @@
 from pysam import VariantFile
 import os
+import time
 
 # Inspired by: @gudeqing
 # https://github.com/sigven/pcgr/issues/136#issuecomment-919273152
@@ -73,7 +74,7 @@ def reformat_vcf(vcf_file, out, reference):
         samples = list(header.samples)
         formats = list(header.formats)
         fnc_str = list(vcf_formats.keys())[list(vcf_formats.values()).index(list(formats))]
-        # append after algorithm check
+        # append after algorithm-function mapping
         header.formats.add('AL', number='.', type='Integer', description='Codes for algorithms that produced the somatic call (1 = mutect2, 2 = freebayes, 3 = strelka)')
         if 'strelka' in fnc_str:
             header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
@@ -113,10 +114,12 @@ def reformat_vcf(vcf_file, out, reference):
                 f.write(f'{tumor}\n{normal}')
                 f.close
 
+    # wait for --samples file to write.
+    time.sleep(10)
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
     os.system(f'bcftools reheader --samples bcftools_reheader.txt --output {out} tmp_1.vcf')
     os.remove('tmp_.vcf')
-    #os.remove('tmp_1.vcf')
+    os.remove('tmp_1.vcf')
     os.system(f'bgzip {out}')
     os.system(f'tabix {out}.gz')
 
