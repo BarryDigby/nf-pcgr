@@ -199,9 +199,9 @@ def collect_sarek_files(input){
         cna_files << [ ids, cna ]
         }
     // Filter out the empty tuple slots '[]' in VCF array i.e select appropriate files
-    collect_vcf = Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }
+    collect_vcf = Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }.view()
     // As above, with catch for no CNVkit files.
-    collect_cna = params.cna_analysis ? Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') } : Channel.fromList( cna_files )
+    collect_cna = params.cna_analysis ? Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') } : Channel.fromList( cna_files ).view()
     sarek_files = collect_vcf.combine(collect_cna, by:0).unique().view()
     return sarek_files
 }
