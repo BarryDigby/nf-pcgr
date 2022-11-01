@@ -202,7 +202,7 @@ def collect_sarek_files(input){
     collect_vcf = Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }.view()
     // As above, with catch for no CNVkit files.
     collect_cna = params.cna_analysis ? Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') } : Channel.fromList( cna_files ).view()
-    sarek_files = collect_vcf.combine(collect_cna, by:0).unique().view()
+    sarek_files = collect_vcf.combine(collect_cna).unique().view()
     return sarek_files
 }
 
