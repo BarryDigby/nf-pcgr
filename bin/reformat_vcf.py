@@ -77,7 +77,7 @@ def reformat_vcf(vcf_file, out, reference):
         header.formats.add('AL', number='.', type='Integer', description='Codes for algorithms that produced the somatic call (1 = mutect2, 2 = freebayes, 3 = strelka)')
         if 'strelka' in fnc_str:
             header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
-        with VariantFile(out, 'w', header=header) as fw:
+        with VariantFile('tmp_1.vcf', 'w', header=header) as fw:
             tumor_is_first = 0
             tumor_is_second = 0
             algorithm = fnc_str.split('_', 1)[0]
@@ -99,9 +99,24 @@ def reformat_vcf(vcf_file, out, reference):
                 record.samples[tumor_idx]['AL'] = algorithm_code
                 record.samples[normal_idx]['AL'] = algorithm_code
                 fw.write(record)
+            ## write file for bcftools reheader.
+            ## one per line, appearing in order of samples in VCF file
+            normal = f'{samples[normal_idx]} NORMAL'
+            tumor = f'{samples[tumor_idx]} TUMOR'
+            ## order matters:
+            if normal_idx == 0:
+                f = open("bcftools_reheader.txt", "w")
+                f.write(f'{normal} + "\n" + {tumor}')
+                f.close
+            else:
+                f = open("bcftools_reheader.txt", "w")
+                f.write(f'{tumor} + "\n" + {normal}')
+                f.close
 
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
+    os.system(f'bcftools reheader --samples bcftools_reheader.txt --output {out} tmp_1.vcf')
     os.remove('tmp_.vcf')
+    #os.remove('tmp_1.vcf')
     os.system(f'bgzip {out}')
     os.system(f'tabix {out}.gz')
 
