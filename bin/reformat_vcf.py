@@ -117,8 +117,11 @@ def reformat_vcf(vcf_file, out, reference):
 
     time.sleep(10)
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
-    print(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
-    os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
+    while not os.path.exists('bcftools_reheader.txt'):
+        time.sleep(1)
+    if os.path.isfile('bcftools_reheader.txt'):
+        time.sleep(5)
+        os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
     #os.remove('tmp_.vcf')
     #os.remove('tmp_1.vcf')
     os.system(f'bgzip {out}')
