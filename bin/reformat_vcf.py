@@ -1,6 +1,5 @@
 from pysam import VariantFile
 import os
-import time
 
 # Inspired by: @gudeqing
 # https://github.com/sigven/pcgr/issues/136#issuecomment-919273152
@@ -102,20 +101,20 @@ def reformat_vcf(vcf_file, out, reference):
                 fw.write(record)
             ## write file for bcftools reheader.
             ## one per line, appearing in order of samples in VCF file
-            normal = f'{samples[normal_idx]} NORMAL'
-            tumor = f'{samples[tumor_idx]} TUMOR'
-            ## order matters:
-            if normal_idx == 0:
-                f = open("bcftools_reheader.txt", "w")
-                f.write(f'{normal}\n{tumor}')
-                f.close
-            else:
-                f = open("bcftools_reheader.txt", "w")
-                f.write(f'{tumor}\n{normal}')
-                f.close
+            ## only do this for non STRELKA VCFs.
+            if samples[normal_idx] is not "NORMAL":
+                normal = f'{samples[normal_idx]} NORMAL'
+                tumor = f'{samples[tumor_idx]} TUMOR'
+                ## order matters:
+                if normal_idx == 0:
+                    f = open("bcftools_reheader.txt", "w")
+                    f.write(f'{normal}\n{tumor}')
+                    f.close
+                else:
+                    f = open("bcftools_reheader.txt", "w")
+                    f.write(f'{tumor}\n{normal}')
+                    f.close
 
-    # wait for --samples file to write.
-    time.sleep(10)
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
     os.system(f'bcftools reheader --samples bcftools_reheader.txt --output {out} tmp_1.vcf')
     os.remove('tmp_.vcf')
