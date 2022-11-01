@@ -192,7 +192,7 @@ def collect_sarek_files(input){
         // match tumor vs normal VCF files
         vcf = it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ? file(it) : []
         // Match CNVkit output file OR produce NA for samplesheet
-        if(params.cna_analysis){ cna = it.name.contains('.cns') ? file(it) : [] }else{ cna = 'NA' }
+        if(params.cna_analysis){ cna = it.name.contains('.cns') ? file(it) : 'NA' }else{ cna = 'NA' }
         // Only grab IDs for VCF or CNVkit file, else NA
         ids = ( it.name.contains('.cns') || it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ) ? it.simpleName.tokenize('_')[0] : 'NA'
         vcf_files << [ ids, vcf ]
