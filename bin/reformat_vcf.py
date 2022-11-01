@@ -106,11 +106,11 @@ def reformat_vcf(vcf_file, out, reference):
             ## order matters:
             if normal_idx == 0:
                 f = open("bcftools_reheader.txt", "w")
-                f.write(f'{normal} + "\n" + {tumor}')
+                f.write(f'{normal}\n{tumor}')
                 f.close
             else:
                 f = open("bcftools_reheader.txt", "w")
-                f.write(f'{tumor} + "\n" + {normal}')
+                f.write(f'{tumor}\n{normal}')
                 f.close
 
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
