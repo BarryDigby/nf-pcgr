@@ -1,6 +1,6 @@
 process FOO {
     echo true
-    tag "$meta.id"
+    tag "$meta"
 
     input:
     tuple val(meta), path(files)
