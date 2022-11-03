@@ -12,7 +12,7 @@ workflow FORMAT_FILES {
     FORMAT_CNA( FORMAT_VCF.out.files )
     FORMAT_CNA.out.files.view()
 
-    // grouptuple and dump VCF files into pcgr merge/simplify process - even if only one tool used.
+    // grouptuple and dump VCF files into pcgr merge/simplify process - even if only one tool used. at min, we will strip genotype data.
     files = params.cna_analysis ? FORMAT_CNA.out.files : FORMAT_VCF.out.files
     sample_files = files.map{ it -> return it[1..-1] }.flatten().unique().map{ it -> meta = it.simpleName; return [ meta, it ] }.groupTuple().view()
 

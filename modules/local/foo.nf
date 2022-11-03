@@ -3,7 +3,7 @@ process FOO {
     tag "$meta"
 
     input:
-    tuple val(meta), path(files)
+    tuple val(meta), path '*'
 
     output:
     stdout emit: output
