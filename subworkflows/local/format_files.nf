@@ -1,5 +1,6 @@
 include { FORMAT_VCF      } from '../../modules/local/PCGR/Format/pcgr_reformat'
 include { FORMAT_CNA      } from '../../modules/local/PCGR/Format/pcgr_reformat'
+include { FOO             } from '../../modules/local/foo'
 
 workflow FORMAT_FILES {
     take:
@@ -11,7 +12,13 @@ workflow FORMAT_FILES {
     FORMAT_CNA( FORMAT_VCF.out.files )
     FORMAT_CNA.out.files.view()
 
-    emit:
+    // grouptuple and dump VCF files into pcgr merge/simplify process - even if only one tool used.
     files = params.cna_analysis ? FORMAT_CNA.out.files : FORMAT_VCF.out.files
+    sample_files = files.map{ it -> return it[1..-1] }.flatten().map{ it -> meta = it.simpleName; return [ meta, it ] }.groupTuple().view()
+
+    FOO( sample_files )
+
+    emit:
+    files
 
 }

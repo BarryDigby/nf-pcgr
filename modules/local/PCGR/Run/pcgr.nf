@@ -1,6 +1,6 @@
 process PCGR {
     tag "${meta.id}:${meta.tool}"
-    label 'process_medium'
+    label 'process_high'
 
     conda (params.enable_conda ? "pcgr::pcgr=1.1.0" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -11,8 +11,8 @@ process PCGR {
     tuple val(meta), path(vcf), path(tbi), path(cna)
 
     output:
-    path "versions.yml"           , emit: versions
     tuple val(meta), path("${prefix}"), emit: pcgr_reports
+    path "versions.yml"               , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

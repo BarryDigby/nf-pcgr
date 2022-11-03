@@ -13,8 +13,8 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 println(params.input)
 // Stage
 //println(params.mode.toLowerCase())
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input file/directory does not exist!' }
-if (params.mode.toLowerCase() == 'pcgr') { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) }
+if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { exit 1, 'Please provide an input samplesheet or path to Sarek results' }
+if (params.mode.toLowerCase() == 'pcgr' && params.fasta) { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) } else {exit 1, 'Please provide the reference genome FASTA file using the --fasta parameter'}
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
