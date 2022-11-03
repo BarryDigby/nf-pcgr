@@ -6,7 +6,7 @@ process FOO {
     tuple val(meta), path(files)
 
     output:
-    stdout , emit: output
+    stdout emit: output
 
     script:
     """
