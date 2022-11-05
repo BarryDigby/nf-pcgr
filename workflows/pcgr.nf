@@ -27,6 +27,7 @@ if (params.mode.toLowerCase() == 'pcgr' && params.fasta) { ch_fasta = Channel.fr
 //
 include { INPUT_CHECK   } from '../subworkflows/local/input_check'
 include { FORMAT_FILES  } from '../subworkflows/local/format_files'
+include { MERGE_VCFS    } from '../subworkflows/local/merge_vcfs'
 
 include { PCGR as RUN_PCGR } from '../modules/local/PCGR/Run/pcgr'
 include { CPSR as RUN_CPSR } from '../modules/local/PCGR/Run/cpsr'
@@ -60,6 +61,8 @@ workflow PCGR {
         ch_input
     )
 
+    // TODO: Run CSPR and give outputs to pcgr. diverging these procs based on params.mode not sensible
+
     // Automatically add INFO and HEADER fields to somatic VCF files
     // Detect CNA tool used and format for PCGR
     // RUN PCGR
@@ -68,9 +71,10 @@ workflow PCGR {
             ch_fasta.collect(), INPUT_CHECK.out.ch_files
         )
         FORMAT_FILES.out.files.view()
-        RUN_PCGR(
+        MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect() )
+        /* RUN_PCGR(
             FORMAT_FILES.out.files
-        )
+        ) */
     }
 
     if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files )
