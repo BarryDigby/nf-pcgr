@@ -10,7 +10,7 @@ process ISEC_VCFS {
     tuple val(meta), path(vcfs)
 
     output:
-    tuple val(meta), path("${prefix}_keys.txt"), emit: sample_keys
+    tuple val(meta), path("${prefix}_keys.txt"), emit: variant_tool_map
 
     when:
     task.ext.when == null || task.ext.when
