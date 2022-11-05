@@ -15,6 +15,6 @@ workflow MERGE_VCFS {
     ISEC_VCFS.out.variant_tool_map.join(sample_vcfs).view()
 
     emit:
-    foo = ISEC_VCFS.out.sample_keys
+    fasta
 
 }
