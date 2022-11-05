@@ -20,7 +20,6 @@ process ISEC_VCFS {
     prefix = task.ext.prefix ?: "${meta}"
     """
     python3.6 "${projectDir}/bin/isec_vcfs.py" \
-        intersect_variants \
         -sample ${prefix}
     """
 }

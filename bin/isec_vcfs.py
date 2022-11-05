@@ -67,12 +67,6 @@ def intersect_variants(sample):
         os.system(f'bcftools view {sample_files[0]} -G -H | awk -v OFS="\t" \'{{print $1, $2, $4, $5, \"{tool_names[0]}\"}}\' > {sample}_keys.txt')
 
 
-
-
-
-
-
-
 if __name__ == '__main__':
     from xcmds import xcmds
     xcmds.xcmds(locals())
