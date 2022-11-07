@@ -60,6 +60,10 @@ def intersect_variants(sample):
 
         assert len(convert_column) == len(frame), f'bytes to TAL section failed - length of list != length DF'
         frame[4] = convert_column
+        # I noticed duplicate rows in the output file during testing. Worrying as I'm not sure how they got there...
+        #chr1    3866080 C       T       freebayes
+        #chr1    3866080 C       T       freebayes
+        frame = frame.drop_duplicates()
         frame.to_csv(f'{sample}_keys.txt', sep="\t", index=None, header=None)
 
     else:
