@@ -1,5 +1,6 @@
 
 include { ISEC_VCFS } from '../../modules/local/Merge/isec_vcfs'
+include { PCGR_VCF  } from '../../modules/local/Merge/pcgr_vcf'
 
 workflow MERGE_VCFS {
     take:
@@ -12,9 +13,9 @@ workflow MERGE_VCFS {
     ISEC_VCFS( sample_vcfs )
 
     // merge back with sample VCFs, produce PCGR ready VCFs.
-    ISEC_VCFS.out.variant_tool_map.join(sample_vcfs).view()
+    PCGR_VCF( ISEC_VCFS.out.variant_tool_map.join(sample_vcfs), "${projectDir}/bin/pcgr_header.txt" )
 
     emit:
-    fasta
+    pcgr_ready_vcf = PCGR_VCF.out.vcf
 
 }
