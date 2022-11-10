@@ -17,6 +17,6 @@ workflow MERGE_VCFS {
     ISEC_VCFS.out.variant_tool_map.join(sample_vcfs).view()
 
     emit:
-    pcgr_ready_vcf = PCGR_VCF.out.vcf
-
+    //pcgr_ready_vcf = PCGR_VCF.out.vcf
+    sample_vcfs
 }
