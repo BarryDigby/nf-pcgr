@@ -10,7 +10,7 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
-println(params.input)
+
 // Stage
 //println(params.mode.toLowerCase())
 if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { exit 1, 'Please provide an input samplesheet or path to Sarek results' }
@@ -70,7 +70,7 @@ workflow PCGR {
         FORMAT_FILES(
             ch_fasta.collect(), INPUT_CHECK.out.ch_files
         )
-        FORMAT_FILES.out.files.view()
+        FORMAT_FILES.out.files
         MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect() )
         RUN_PCGR(
             MERGE_VCFS.out.pcgr_ready_vcf

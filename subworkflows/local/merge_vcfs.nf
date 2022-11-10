@@ -19,8 +19,9 @@ workflow MERGE_VCFS {
     PCGR_VCF( sample_vcfs_keys, "${projectDir}/bin/pcgr_header.txt")
 
     // Add the CNVkit file back to the PCGR ready VCFs
-    // GroupTuple used earlier to create one chan, use unique here as we only want 1 CNVkit file.
-    cna_file = files.filter{ it -> it.toString().endsWith('.cnvkit.tsv') }.view()
+    // GroupTuple logic as above.
+    cna_file = files.map{ it -> return it[3] }.flatten().map{ it -> meta = [:]; meta.id = it.simpleName; return [ meta, it ] }.groupTuple()
+    cna_file.view()
 
     emit:
     // flattencollect to satisfy input cardinality. nested tuple [ meta[vcf, tbi], cna] otherwise

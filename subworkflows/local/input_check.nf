@@ -44,7 +44,7 @@ workflow INPUT_CHECK {
     // Made the decision to use the same input tuple for (!params.cna_analysis && params.mode = 'cpsr')
     if(params.cna_analysis){
         files.mix(ch_tabix_bgzip, ch_tabix_tabix)
-                .groupTuple(by: 0).view()
+                .groupTuple(by: 0)
                 .flatten()
                 .filter{ it -> !it.toString().endsWith('.vcf')}
                 .collate(4, false)
