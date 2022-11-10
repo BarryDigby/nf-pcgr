@@ -11,7 +11,7 @@ process PCGR_VCF {
     path(pcgr_header)
 
     output:
-    tuple val(meta), path("${prefix}*"), emit: vcf
+    tuple val(meta), path("${prefix}.vcf.gz"), path("${prefix}.vcf.gz.tbi") emit: vcf
 
     when:
     task.ext.when == null || task.ext.when

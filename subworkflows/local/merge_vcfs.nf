@@ -17,8 +17,11 @@ workflow MERGE_VCFS {
 
     PCGR_VCF( sample_vcfs_keys, "${projectDir}/bin/pcgr_vcf.py")
 
+    // rework to make meta a tuple
+    foo = PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> var = [:]; var.id = meta; return [ meta, vcf, tbi ]}.view()
+
     emit:
     // flattencollect to satisfy input cardinality. nested tuple [ meta[vcf, tbi], cna] otherwise
-    pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> meta = it[3].simpleName; return [ meta, it[3] ]} ).flatten().collect() : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
+    pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> return [ it[0], it[3] ]} ).flatten().collect() : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
     //sample_vcfs
 }
