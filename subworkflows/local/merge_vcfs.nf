@@ -18,6 +18,6 @@ workflow MERGE_VCFS {
     PCGR_VCF( sample_vcfs_keys, "${projectDir}/bin/pcgr_vcf.py")
 
     emit:
-    pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> meta = it.simpleName; return [ meta, it[3] ] }) : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
+    pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> meta = it.simpleName; return [ meta, it[3] ] }).view() : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
     //sample_vcfs
 }
