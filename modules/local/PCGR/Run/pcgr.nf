@@ -1,5 +1,5 @@
 process PCGR {
-    tag "${meta.id}:${meta.tool}"
+    tag "${meta.id}"
     label 'process_high'
 
     conda (params.enable_conda ? "pcgr::pcgr=1.1.0" : null)
