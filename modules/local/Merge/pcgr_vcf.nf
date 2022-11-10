@@ -1,5 +1,5 @@
 process PCGR_VCF {
-    tag "$meta"
+    tag "$meta.id"
     label 'process_medium'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -18,7 +18,7 @@ process PCGR_VCF {
 
     script:
     def args = task.ext.args ?: ''
-    prefix = task.ext.prefix ?: "${meta}"
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     python3.6 "${projectDir}/bin/pcgr_vcf.py" \
         -sample ${prefix}

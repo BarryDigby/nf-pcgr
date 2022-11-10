@@ -1,5 +1,5 @@
 process ISEC_VCFS {
-    tag "$meta"
+    tag "$meta.id"
     label 'process_medium'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -17,7 +17,7 @@ process ISEC_VCFS {
 
     script:
     def args = task.ext.args ?: ''
-    prefix = task.ext.prefix ?: "${meta}"
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     python3.6 "${projectDir}/bin/isec_vcfs.py" \
         -sample ${prefix}
