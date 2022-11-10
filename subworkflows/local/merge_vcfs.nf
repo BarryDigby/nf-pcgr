@@ -22,6 +22,6 @@ workflow MERGE_VCFS {
 
     emit:
     // flattencollect to satisfy input cardinality. nested tuple [ meta[vcf, tbi], cna] otherwise
-    pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> return [ it[0], it[3] ]} ) : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
+    pcgr_ready_vcf = params.cna_analysis ? foo.join( files.map{ it -> return [ it[0], it[3] ]} ) : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
     //sample_vcfs
 }
