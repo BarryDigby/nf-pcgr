@@ -20,7 +20,7 @@ workflow MERGE_VCFS {
 
     // Add the CNVkit file back to the PCGR ready VCFs
     // GroupTuple logic as above.
-    cna_file = files.map{ it -> return it[3] }.flatten().map{ it -> meta = [:]; meta.id = it.simpleName; return [ meta, it ] }.groupTuple()
+    cna_file = files.map{ it -> return it[3] }.flatten().take(1).map{ it -> meta = [:]; meta.id = it.simpleName; return [ meta, it ] }
     cna_file.view()
 
     emit:
