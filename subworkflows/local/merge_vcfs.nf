@@ -12,11 +12,12 @@ workflow MERGE_VCFS {
     sample_vcfs = files.map{ it -> return it[1..2] }.flatten().map{ it -> meta = it.simpleName; return [ meta, it ] }.groupTuple()
     ISEC_VCFS( sample_vcfs )
 
-
     // merge back with sample VCFs, produce PCGR ready VCFs.
-    ISEC_VCFS.out.variant_tool_map.join(sample_vcfs).view()
+    sample_vcfs_keys = ISEC_VCFS.out.variant_tool_map.join(sample_vcfs)
+
+    PCGR_VCF( sample_vcfs_keys, "${projectDir}/bin/pcgr_vcf.py")
 
     emit:
-    //pcgr_ready_vcf = PCGR_VCF.out.vcf
-    sample_vcfs
+    pcgr_ready_vcf = PCGR_VCF.out.vcf
+    //sample_vcfs
 }
