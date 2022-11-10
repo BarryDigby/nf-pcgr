@@ -19,12 +19,7 @@ workflow MERGE_VCFS {
     PCGR_VCF( sample_vcfs_keys, "${projectDir}/bin/pcgr_header.txt")
 
     // Add the CNVkit file back to the PCGR ready VCFs
-    // GroupTuple logic as above.
-    cna_file = files.map{ it -> return it[3] }.flatten().take(1).map{ it -> meta = [:]; meta.id = it.simpleName; return [ meta, it ] }
-    cna_file.view()
-
     emit:
-    // flattencollect to satisfy input cardinality. nested tuple [ meta[vcf, tbi], cna] otherwise
-    pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> return [ it[0], it[3] ]} ) : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
-    //sample_vcfs
+    pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> return it[3] }.flatten().take(1).map{ it -> meta = [:]; meta.id = it.simpleName; return [ meta, it ] } ) : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
+
 }
