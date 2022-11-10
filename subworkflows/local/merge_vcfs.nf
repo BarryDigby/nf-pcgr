@@ -16,7 +16,7 @@ workflow MERGE_VCFS {
     sample_vcfs_keys = ISEC_VCFS.out.variant_tool_map.join(sample_vcfs)
 
     PCGR_VCF( sample_vcfs_keys, "${projectDir}/bin/pcgr_vcf.py")
-
+    files.map{ it -> meta = it.simpleName; return [ meta, it[3] ]}.view()
     emit:
     pcgr_ready_vcf = params.cna_analysis ? PCGR_VCF.out.vcf.join( files.map{ it -> meta = it.simpleName; return [ meta, it[3] ] }).view() : PCGR_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
     //sample_vcfs
