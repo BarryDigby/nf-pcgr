@@ -29,11 +29,8 @@ def intersect_variants(sample):
         for file in file_list:
             file_size = os.stat(file).st_size
             fn_size[file] = file_size
-        for key, val in fn_size.items():
-            if val == 0:
-                remove_key = key
-        fn_size.pop(f'{remove_key}')
-        fn_size
+        # remove sites.txt files that are empty
+        fn_size = {key:val for key, val in fn_size.items() if val != 0}
         file_list = list(fn_size.keys())
 
         li = []
