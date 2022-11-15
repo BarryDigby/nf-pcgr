@@ -27,7 +27,7 @@ def pcgr_ready_vcf(sample):
     vcf_dict = {}
     for idx, x in enumerate(sample_files):
         idx = idx + 1
-        os.system(f'vcf2tsvpy --input_vcf {x} --out_tsv {idx}.tmp --skip_genotype_data')
+        os.system(f'vcf2tsvpy --input_vcf {x} --out_tsv {idx}.tmp --skip_genotype_data --keep_rejected_calls')
         os.system(f'tail -n +2 {idx}.tmp > {idx}.tsv && rm {idx}.tmp')
         df = pd.read_table(f'{idx}.tsv', usecols=fields, low_memory=True, sep="\t")
         df.index = pd.MultiIndex.from_arrays(df.values.T[(0,1,3,4),])
