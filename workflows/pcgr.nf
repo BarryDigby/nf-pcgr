@@ -17,7 +17,9 @@ if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { e
 if (params.mode.toLowerCase() == 'pcgr' && params.fasta) { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) }
 
 // Add Database as channel. String paths do not work on AWS.
-ch_pcgr_dir = Channel.fromPath(params.database)
+// Only stage the genome db we are interested in.
+ch_pcgr_dir = Channel.fromPath("${params.database}/data/${params.genome}")
+ch_pcgr_dir.view()
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
