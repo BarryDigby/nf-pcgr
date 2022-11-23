@@ -16,7 +16,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { exit 1, 'Please provide an input samplesheet or path to Sarek results' }
 if (params.mode.toLowerCase() == 'pcgr' && params.fasta) { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) }
 
-if (params.database) { ch_pcgr_dir = Channel.fromPath(params.database) } else { exit 1, "Please provide a path to the PCGR annotation database." }
+if (params.database) { ch_pcgr_dir = Channel.fromPath("${params.database}/data/${params.genome}") } else { exit 1, "Please provide a path to the PCGR annotation database." }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
