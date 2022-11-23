@@ -16,6 +16,8 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { exit 1, 'Please provide an input samplesheet or path to Sarek results' }
 if (params.mode.toLowerCase() == 'pcgr' && params.fasta) { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) }
 
+ch_pcgr_dir = params.database ? Channel.fromPath(params.database) : exit 1, "Please provide a path to the PCGR annotation database."
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     IMPORT LOCAL MODULES/SUBWORKFLOWS
@@ -73,11 +75,12 @@ workflow PCGR {
         FORMAT_FILES.out.files
         MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect() )
         RUN_PCGR(
-            MERGE_VCFS.out.pcgr_ready_vcf
+            MERGE_VCFS.out.pcgr_ready_vcf,
+            ch_pcgr_dir
         )
     }
 
-    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files )
+    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files, ch_pcgr_dir )
 
 }
 
