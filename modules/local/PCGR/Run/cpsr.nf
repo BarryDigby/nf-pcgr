@@ -10,6 +10,7 @@ process CPSR {
     input:
     // tuple [ meta, [vcf] , [vcf.tbi] ]
     tuple val(meta), path(vcf), path(tbi), path(cna)
+    path(pcgr_dir)
 
     output:
     path "versions.yml"           , emit: versions
@@ -20,7 +21,7 @@ process CPSR {
 
     script:
     def genome   = task.ext.genome ?: ''
-    def database = task.ext.database ?: ''
+    def database = './' // we are staging the databse to the work dir using pcgr_dir.
     def prefix   = task.ext.prefix ?: "${meta.id}"
     def args     = task.ext.args ?: ''
     """

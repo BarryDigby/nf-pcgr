@@ -19,7 +19,7 @@ process FORMAT_VCF {
     script:
     prefix = task.ext.prefix ?: "${meta.id}.${meta.tool}"
     """
-    python3.6 "${projectDir}/bin/reformat_vcf.py" \
+    reformat_vcf.py \
         reformat_vcf \
         -vcf_file $vcf \
         -out ${prefix}.vcf \
@@ -47,7 +47,7 @@ process FORMAT_CNA {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    python3.6 "${projectDir}/bin/reformat_cna.py" \
+    reformat_cna.py \
         reformat_cna \
         -cna_file $cna \
         -sample $prefix
