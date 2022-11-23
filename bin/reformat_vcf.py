@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from pysam import VariantFile
 import os
 import time
