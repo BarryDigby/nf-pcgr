@@ -9,7 +9,7 @@ process PCGR {
 
     input:
     tuple val(meta), path(vcf), path(tbi), path(cna)
-    path(pcgr_dir)
+    path(pcgr_dir), stageAs: "PCGR/data/${params.genome}"
 
     output:
     tuple val(meta), path("${prefix}"), emit: pcgr_reports
@@ -20,12 +20,13 @@ process PCGR {
 
     script:
     def genome   = task.ext.genome ?: ''
-    def database = './'
+    def database = './PCGR'
     def args     = task.ext.args ?: ''
     prefix       = task.ext.prefix ?: "${meta.id}.${meta.tool}"
     def cna      = params.cna_analysis ? "--input_cna $cna" : ''
     """
     mkdir -p $prefix
+    ln -s gchr PCGR/data/gh
 
     pcgr \\
         --input_vcf $vcf \\
