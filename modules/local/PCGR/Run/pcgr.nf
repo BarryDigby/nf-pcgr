@@ -26,7 +26,6 @@ process PCGR {
     def cna      = params.cna_analysis ? "--input_cna $cna" : ''
     """
     mkdir -p $prefix
-    ln -s gchr PCGR/data/gh
 
     pcgr \\
         --input_vcf $vcf \\
