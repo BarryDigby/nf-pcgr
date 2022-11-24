@@ -19,7 +19,7 @@ process ISEC_VCFS {
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    python3.6 "${projectDir}/bin/isec_vcfs.py" \
+    isec_vcfs.py \
         -sample ${prefix}
     """
 }

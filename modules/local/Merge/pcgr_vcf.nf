@@ -20,7 +20,7 @@ process PCGR_VCF {
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    python3.6 "${projectDir}/bin/pcgr_vcf.py" \
+    pcgr_vcf.py \
         -sample ${prefix}
     """
 }
