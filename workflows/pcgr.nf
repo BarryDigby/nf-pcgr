@@ -76,11 +76,11 @@ workflow PCGR {
         MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect() )
         RUN_PCGR(
             MERGE_VCFS.out.pcgr_ready_vcf,
-            ch_pcgr_dir
+            ch_pcgr_dir.collect()
         )
     }
 
-    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files, ch_pcgr_dir )
+    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files, ch_pcgr_dir.collect() )
 
 }
 
