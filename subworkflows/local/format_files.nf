@@ -1,5 +1,5 @@
-include { BCFTOOLS_NORM   } from '../modules/nf-core/bcftools/norm/main'
-include { BCFTOOLS_FILTER } from '../modules/nf-core/bcftools/filter/main'
+include { BCFTOOLS_NORM   } from '../../modules/nf-core/bcftools/norm/main'
+include { BCFTOOLS_FILTER } from '../../modules/nf-core/bcftools/filter/main'
 include { FORMAT_VCF      } from '../../modules/local/PCGR/Format/pcgr_reformat'
 include { FORMAT_CNA      } from '../../modules/local/PCGR/Format/pcgr_reformat'
 
