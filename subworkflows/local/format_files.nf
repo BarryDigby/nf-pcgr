@@ -1,5 +1,6 @@
 include { BCFTOOLS_NORM   } from '../../modules/nf-core/bcftools/norm/main'
 include { BCFTOOLS_FILTER } from '../../modules/nf-core/bcftools/filter/main'
+include { TABIX_TABIX as TBX } from '../../modules/nf-core/tabix/tabix/main'
 include { FORMAT_VCF      } from '../../modules/local/PCGR/Format/pcgr_reformat'
 include { FORMAT_CNA      } from '../../modules/local/PCGR/Format/pcgr_reformat'
 
@@ -11,8 +12,9 @@ workflow FORMAT_FILES {
     main:
     BCFTOOLS_NORM( files.map{ it -> return [ it[0], it[1], it[2] ] }, fasta )
     BCFTOOLS_FILTER( BCFTOOLS_NORM.out.vcf )
+    TBX( BCFTOOLS_FILTER.out.vcf )
 
-    FORMAT_VCF( BCFTOOLS_FILTER.out.vcf )
+    FORMAT_VCF( BCFTOOLS_FILTER.out.vcf.join( TBX.out.tbi ) )
     FORMAT_CNA( files.map{ it -> return [ it[0], it[3] ]} )
 
     FORMAT_CNA.out.cna.view()
