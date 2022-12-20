@@ -4,30 +4,21 @@ include { TABIX_BGZIPTABIX } from '../../modules/nf-core/tabix/bgziptabix/main'
 
 workflow INPUT_CHECK {
     take:
-     // samplesheet file or path to files accpeted
-    ch_input
+    ch_input // staged as file object using file(params.input)
 
     main:
-    // Step 1.
-    // allow the user to provide a samplesheet, or path to sarek directory.
-    // Functions at end of file.
     if( ch_input.toString().endsWith('.csv') ){
-        // ch_input is file(params.input)
         samplesheet = Channel.of(ch_input)
         check_input(samplesheet)
     }else{
-        // ch_input goes from 'file' (no channel) to channel containing constr samp file.
-        // use map to grab the file from the channel.
         sarek_files = collect_sarek_files(ch_input)
         sarek_files.collectFile( name: 'constructed_samplesheet.csv', newLine:false, storeDir: "${params.outdir}/pipeline_info", keepHeader: true ){ ids, vcf, cna -> "sample,vcf,cna" + "\n" + "$ids,$vcf,$cna" + "\n"}.set{ constructed_samplesheet }
         samplesheet = constructed_samplesheet.map{ it ->
-                                                   samp_file = file(it)
-                                                   return samp_file }
-
+                                                    samp_file = file(it)
+                                                    return samp_file }
         check_input(samplesheet)
     }
 
-    // Step 2.
     // Determine if vcf files need to be bgzipped and or tabixed.
     // 0: meta, 1: vcf, 2: tbi, 3: cna.
     // must use it instead of names here due to different input tuple len for modes.
@@ -49,10 +40,10 @@ workflow INPUT_CHECK {
                 .filter{ it -> !it.toString().endsWith('.vcf')}
                 .collate(4, false)
                 .map{ meta, vcf, tbi, cna ->
-                      var = [:]
-                      var.id = meta.id
-                      var.tool = meta.tool
-                      return [var, vcf, tbi, cna]}.set{ ch_files }
+                        var = [:]
+                        var.id = meta.id
+                        var.tool = meta.tool
+                        return [var, vcf, tbi, cna]}.set{ ch_files }
     }else{
         files.mix(ch_tabix_bgzip, ch_tabix_tabix)
                 .groupTuple(by: 0)
@@ -60,10 +51,10 @@ workflow INPUT_CHECK {
                 .filter{ it -> !it.toString().endsWith('.vcf')}
                 .collate(3, false)
                 .map{ meta, vcf, tbi ->
-                      var = [:]
-                      var.id = meta.id
-                      var.tool = meta.tool
-                      return [var, vcf, tbi, [] ]}.set{ ch_files }
+                        var = [:]
+                        var.id = meta.id
+                        var.tool = meta.tool
+                        return [var, vcf, tbi, [] ]}.set{ ch_files }
     }
 
 
@@ -131,17 +122,17 @@ def check_input(input){
 
                 // Check if the VCF file is bgzipped
                 if(!vcf.toString().endsWith('.gz') && vcf.toString().endsWith('.vcf')){
-                    log.warn("The input VCF file '${vcf}' is not bgzipped.")
+                    log.warn("The input VCF file '${vcf}' is not bgzipped. nf-pcgr will bgzip it for you.")
                     meta.bgzip_vcf = true
                 }else{
                     meta.bgzip_vcf = false
                 }
 
-                // Check existence of TBI indexed VCF file (!presumed to be in the same directory!)
+                // Check existence of TBI indexed VCF file (presumed to be in the same directory)
                 // Unsure how this behaves on a cloud instance.
                 tbi  = vcf.toString() + '.tbi'
                 if(!file(tbi).exists()){
-                    log.warn("The input VCF file '${vcf}' is not tabix indexed.")
+                    log.warn("The input VCF file '${vcf}' is not tabix indexed. nf-pcgr will tabiz it for you")
                     meta.tabix_vcf = true
                     tbi = []
                 }else{

@@ -2,10 +2,10 @@ process GATK4_CREATESOMATICPANELOFNORMALS {
     tag "$meta.id"
     label 'process_low'
 
-    conda (params.enable_conda ? "bioconda::gatk4=4.2.6.1" : null)
+    conda "bioconda::gatk4=4.3.0.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/gatk4:4.2.6.1--hdfd78af_0':
-        'quay.io/biocontainers/gatk4:4.2.6.1--hdfd78af_0' }"
+        'https://depot.galaxyproject.org/singularity/gatk4:4.3.0.0--py36hdfd78af_0':
+        'quay.io/biocontainers/gatk4:4.3.0.0--py36hdfd78af_0' }"
 
     input:
     tuple val(meta), path(genomicsdb)
@@ -38,6 +38,7 @@ process GATK4_CREATESOMATICPANELOFNORMALS {
         --reference $fasta \\
         --tmp-dir . \\
         $args
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         gatk4: \$(echo \$(gatk --version 2>&1) | sed 's/^.*(GATK) v//; s/ .*\$//')

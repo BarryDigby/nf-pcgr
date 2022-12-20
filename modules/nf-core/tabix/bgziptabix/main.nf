@@ -1,9 +1,8 @@
 process TABIX_BGZIPTABIX {
     tag "$meta.id"
-    label 'process_low'
-    // TODO return to proc_medium after dev runs
+    label 'process_single'
 
-    conda (params.enable_conda ? 'bioconda::tabix=1.11' : null)
+    conda "bioconda::tabix=1.11"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/tabix:1.11--hdfd78af_0' :
         'quay.io/biocontainers/tabix:1.11--hdfd78af_0' }"
@@ -21,7 +20,7 @@ process TABIX_BGZIPTABIX {
     script:
     def args = task.ext.args ?: ''
     def args2 = task.ext.args2 ?: ''
-    def prefix = task.ext.prefix ?: "${input.baseName}"
+    def prefix = task.ext.prefix ?: "${meta.id}"
     """
     bgzip  --threads ${task.cpus} -c $args $input > ${prefix}.${input.getExtension()}.gz
     tabix $args2 ${prefix}.${input.getExtension()}.gz
