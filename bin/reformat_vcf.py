@@ -2,7 +2,6 @@
 
 from pysam import VariantFile
 import os
-import time
 
 # Inspired by: @gudeqing
 # https://github.com/sigven/pcgr/issues/136#issuecomment-919273152
@@ -67,7 +66,7 @@ def reformat_vcf(vcf_file, out):
     BCFtools: reformatting sample names to NORMAL, TUMOR for downstream merging.
     """
     #os.system(f'bcftools norm -f {reference} -m -both {vcf_file} | bcftools filter -e\'FORMAT/DP="." || FORMAT/DP<1\' -o tmp_.vcf')
-    with VariantFile('vcf_file') as fr:
+    with VariantFile(vcf_file) as fr:
         header = fr.header
         header.info.add('TDP', number=1, type='Integer', description='Tumor sample depth')
         header.info.add('NDP', number=1, type='Integer', description='Normal sample depth')
