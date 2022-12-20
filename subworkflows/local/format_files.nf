@@ -15,7 +15,7 @@ workflow FORMAT_FILES {
     FORMAT_VCF( BCFTOOLS_FILTER.out.vcf )
     FORMAT_CNA( files.map{ it -> return [ it[0], it[3] ]} )
 
-    FORMAT_CNA.out.files.view()
+    FORMAT_CNA.out.cna.view()
 
     files = FORMAT_VCF.out.vcf.join( FORMAT_CNA.out.cna )
 
