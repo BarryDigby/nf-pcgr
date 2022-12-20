@@ -7,7 +7,7 @@ process FORMAT_VCF {
         'docker.io/barryd237/pysam-xcmds:latest' }"
 
     input:
-    tuple val(meta), path(vcf)
+    tuple val(meta), path(vcf), path(tbi)
 
     output:
     tuple val(meta), path("${prefix}.vcf.gz"), path("${prefix}.vcf.gz.tbi"), emit: vcf
