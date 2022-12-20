@@ -7,11 +7,10 @@ process FORMAT_VCF {
         'docker.io/barryd237/pysam-xcmds:latest' }"
 
     input:
-    path(fasta)
-    tuple val(meta), path(vcf), path(tbi), path(cna)
+    tuple val(meta), path(vcf)
 
     output:
-    tuple val(meta), path("${prefix}.vcf.gz"), path("${prefix}.vcf.gz.tbi"), path(cna), emit: files
+    tuple val(meta), path("${prefix}.vcf.gz"), path("${prefix}.vcf.gz.tbi"), emit: vcf
 
     when:
     task.ext.when == null || task.ext.when
@@ -19,11 +18,10 @@ process FORMAT_VCF {
     script:
     prefix = task.ext.prefix ?: "${meta.id}.${meta.tool}"
     """
-    reformat_vcf.py \
-        reformat_vcf \
-        -vcf_file $vcf \
-        -out ${prefix}.vcf \
-        -reference $fasta
+    reformat_vcf.py \\
+        reformat_vcf \\
+        -vcf_file $vcf \\
+        -out ${prefix}.vcf
     """
 }
 
@@ -36,10 +34,10 @@ process FORMAT_CNA {
         'docker.io/barryd237/pysam-xcmds:latest' }"
 
     input:
-    tuple val(meta), path(vcf), path(tbi), path(cna)
+    tuple val(meta), path(cna)
 
     output:
-    tuple val(meta), path(vcf), path(tbi), path("${meta.id}.*.tsv"), emit: files
+    tuple val(meta), path("${meta.id}.*.tsv"), emit: cna
 
     when:
     task.ext.when == null || task.ext.when

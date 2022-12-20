@@ -60,14 +60,14 @@ vcf_formats = { "mutect2_vaf": ['AD', 'AF', 'DP', 'F1R2', 'F2R1', 'FAD', 'GQ', '
 #####################################################################################################################
 #####################################################################################################################
 
-def reformat_vcf(vcf_file, out, reference):
+def reformat_vcf(vcf_file, out):
     """
     BCFtools: split multi-allelic sites, normalize and remove sites where DP is missing or < 1. (divide by zero errors).
     Calculations need to be cross checked with someone with more experience in population genomics.
     BCFtools: reformatting sample names to NORMAL, TUMOR for downstream merging.
     """
-    os.system(f'bcftools norm -f {reference} -m -both {vcf_file} | bcftools filter -e\'FORMAT/DP="." || FORMAT/DP<1\' -o tmp_.vcf')
-    with VariantFile('tmp_.vcf') as fr:
+    #os.system(f'bcftools norm -f {reference} -m -both {vcf_file} | bcftools filter -e\'FORMAT/DP="." || FORMAT/DP<1\' -o tmp_.vcf')
+    with VariantFile('vcf_file') as fr:
         header = fr.header
         header.info.add('TDP', number=1, type='Integer', description='Tumor sample depth')
         header.info.add('NDP', number=1, type='Integer', description='Normal sample depth')
@@ -117,7 +117,7 @@ def reformat_vcf(vcf_file, out, reference):
 
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
     os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
-    os.remove('tmp_.vcf')
+    #os.remove('tmp_.vcf')
     os.remove('tmp_1.vcf')
     os.system(f'bgzip {out}')
     os.system(f'tabix {out}.gz')
