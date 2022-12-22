@@ -19,7 +19,7 @@ workflow FORMAT_FILES {
 
     FORMAT_CNA.out.cna.view()
 
-    files = FORMAT_VCF.out.vcf.join( FORMAT_CNA.out.cna )
+    files = params.cna_analysis ? FORMAT_VCF.out.vcf.join( FORMAT_CNA.out.cna ) : FORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
 
     emit:
     files
