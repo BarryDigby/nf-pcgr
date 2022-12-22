@@ -10,7 +10,7 @@ process CPSR {
     input:
     // tuple [ meta, [vcf] , [vcf.tbi] ]
     tuple val(meta), path(vcf), path(tbi), path(cna)
-    path(pcgr_dir), stageAs: "PCGR/data/${params.genome}"
+    path(pcgr_dir), stageAs: "PCGR/data/${params.genome.toLowerCase()}"
 
     output:
     path "versions.yml"           , emit: versions
