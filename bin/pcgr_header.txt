@@ -1,5 +1,6 @@
 ##fileformat=VCFv4.2
 ##FILTER=<ID=PASS,Description="All filters passed">
+##FILTER=<ID=LowEVS,Description="Somatic Empirical Variant Score (SomaticEVS) is below threshold">
 ##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
 ##FORMAT=<ID=DPT,Number=1,Type=Integer,Description="Sequencing depth at variant position (tumor)">
 ##FORMAT=<ID=DPC,Number=1,Type=Integer,Description="Sequencing depth at variant position (control)">

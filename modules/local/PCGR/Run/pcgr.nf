@@ -22,7 +22,7 @@ process PCGR {
     def genome   = task.ext.genome ?: ''
     def database = './PCGR'
     def args     = task.ext.args ?: ''
-    prefix       = task.ext.prefix ?: "${meta.id}.${meta.tool}"
+    prefix       = task.ext.prefix ?: "${meta.id}"
     def cna      = params.cna_analysis ? "--input_cna $cna" : ''
     """
     mkdir -p $prefix
