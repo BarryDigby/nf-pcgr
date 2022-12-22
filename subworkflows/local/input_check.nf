@@ -83,13 +83,39 @@ def check_input(input){
     input.splitCsv(header:true, sep:',')
         .map{ row ->
 
+            // Check that the patient column exists in samplesheet
+            if (row.patient) patient = row.patient
+            else patient = 'NA'
+
+            // Exit and tell user to add Patient column to samplesheet
+            if(patient == 'NA'){
+                log.error("ERROR: The input file '(${input})'' does not have a 'patient' column.\n\nYou must add a 'patient' column in the samplesheet denoting the patient/subject ID.")
+                System.exit(1)
+            }
+
+            // Check status column exists in samplesheet
+            if (row.status) status = row.status
+            else status = 'NA'
+
+            // Exit and tell user to add Status column to samplesheet
+            if(status == 'NA'){
+                log.error("ERROR: The input file '(${input})'' does not have a 'status' column.\n\nYou must add a 'status' column in the samplesheet denoting the status of the sample: Normal (0), Tumor (1).")
+                System.exit(1)
+            }
+
+            // Check Status is valid
+            if (!status in ['0', '1']){
+                log.error("ERROR: The input file '(${input})'' must contain 0 or 1 values for the colum 'status'. Offending entry: ${status}.")
+                System.exit(1)
+            }
+
             // Check that sample column exists in samplesheet
             if (row.sample) sample = row.sample
             else sample = 'NA'
 
             // Exit and tell user to add Sample column to samplesheet
             if(sample == 'NA'){
-                log.error("ERROR: Your input file '(${input})'' does not have a 'sample' column.\n\nYou must add a 'sample' column in the samplesheet denoting the sample ID.")
+                log.error("ERROR: The input file '(${input})'' does not have a 'sample' column.\n\nYou must add a 'sample' column in the samplesheet denoting the sample type belonging to the patient.")
                 System.exit(1)
             }
 
@@ -99,7 +125,7 @@ def check_input(input){
 
             // Exit and tell user to add VCF column to samplesheet
             if(vcf == 'NA'){
-                log.error("ERROR: Your input file '(${input})'' does not have a 'vcf' column.\n\nYou must add a 'vcf' column in the samplesheet specifying paths to input VCF files.")
+                log.error("ERROR: The input file '(${input})'' does not have a 'vcf' column.\n\nYou must add a 'vcf' column in the samplesheet specifying paths to input VCF files.")
                 System.exit(1)
             }
 
@@ -109,10 +135,11 @@ def check_input(input){
                 System.exit(1)
             }else{
 
-                // Capture sample ID
-                def meta = [:]
-                vcf      = file(row.vcf)
-                meta.id  = sample
+                // Capture metadata
+                def meta     = [:]
+                vcf          = file(row.vcf)
+                meta.patient = patient
+                meta.status  = status == "1" ? 'somatic' : 'germline'
 
                 // Capture tool name (users must follow sarek naming conventions)
                 // This is crucial for properly combining the outputs of BGZIP/TABIX
@@ -122,7 +149,6 @@ def check_input(input){
 
                 // Check if the VCF file is bgzipped
                 if(!vcf.toString().endsWith('.gz') && vcf.toString().endsWith('.vcf')){
-                    log.warn("The input VCF file '${vcf}' is not bgzipped. nf-pcgr will bgzip it for you.")
                     meta.bgzip_vcf = true
                 }else{
                     meta.bgzip_vcf = false
@@ -132,7 +158,6 @@ def check_input(input){
                 // Unsure how this behaves on a cloud instance.
                 tbi  = vcf.toString() + '.tbi'
                 if(!file(tbi).exists()){
-                    log.warn("The input VCF file '${vcf}' is not tabix indexed. nf-pcgr will tabiz it for you")
                     meta.tabix_vcf = true
                     tbi = []
                 }else{

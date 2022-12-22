@@ -1,5 +1,5 @@
-sample,vcf,cna
-HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.mutect2.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
-HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.freebayes.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
-HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.strelka.somatic_snvs.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
-HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.strelka.somatic_indels.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
+pateint,status,sample,vcf,cna
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.mutect2.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.freebayes.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.strelka.somatic_snvs.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.strelka.somatic_indels.vcf.gz,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T.cns
