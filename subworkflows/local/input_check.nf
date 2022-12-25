@@ -1,6 +1,6 @@
 
-include { TABIX_TABIX      } from '../../modules/nf-core/tabix/tabix/main'
-include { TABIX_BGZIPTABIX } from '../../modules/nf-core/tabix/bgziptabix/main'
+include { TABIX_TABIX as TABIX_INPUT_VCF } from '../../modules/nf-core/tabix/tabix/main'
+include { TABIX_BGZIPTABIX as BGZIP_INPUT_VCF } from '../../modules/nf-core/tabix/bgziptabix/main'
 
 workflow INPUT_CHECK {
     take:
@@ -22,12 +22,12 @@ workflow INPUT_CHECK {
     // Determine if vcf files need to be bgzipped and or tabixed.
     // 0: meta, 1: vcf, 2: tbi, 3: cna.
     // must use it instead of names here due to different input tuple len for modes.
-    TABIX_BGZIPTABIX( files.map{ it -> [it[0], it[1]]} )
-    TABIX_TABIX( files.map{ it -> [it[0], it[1]]} )
+    BGZIP_INPUT_VCF( files.map{ it -> [it[0], it[1]]} )
+    TABIX_INPUT_VCF( files.map{ it -> [it[0], it[1]]} )
 
     // If procs were not run, flatten takes care of ifEmpty([]) in step below.
-    ch_tabix_bgzip = TABIX_BGZIPTABIX.out.gz_tbi.ifEmpty([])
-    ch_tabix_tabix = TABIX_TABIX.out.tbi.ifEmpty([])
+    ch_tabix_bgzip = BGZIP_INPUT_VCF.out.gz_tbi.ifEmpty([])
+    ch_tabix_tabix = TABIX_INPUT_VCF.out.tbi.ifEmpty([])
 
     // Step 3.
     // Using meta as the grouping key, combine the newly bgzipped/tabixed VCF files appropriately.
@@ -41,9 +41,13 @@ workflow INPUT_CHECK {
                 .collate(4, false)
                 .map{ meta, vcf, tbi, cna ->
                         var = [:]
-                        var.id = meta.id
-                        var.tool = meta.tool
-                        return [var, vcf, tbi, cna]}.set{ ch_files }
+                        var.id      = meta.id
+                        var.patient = meta.patient
+                        var.status  = meta.status
+                        var.sample  = meta.sample
+                        var.tool    = meta.tool
+                        return [var, vcf, tbi, cna]}
+                .set{ ch_files }
     }else{
         files.mix(ch_tabix_bgzip, ch_tabix_tabix)
                 .groupTuple(by: 0)
@@ -52,9 +56,13 @@ workflow INPUT_CHECK {
                 .collate(3, false)
                 .map{ meta, vcf, tbi ->
                         var = [:]
-                        var.id = meta.id
-                        var.tool = meta.tool
-                        return [var, vcf, tbi, [] ]}.set{ ch_files }
+                        var.id      = meta.id
+                        var.patient = meta.patient
+                        var.status  = meta.status
+                        var.sample  = meta.sample
+                        var.tool    = meta.tool
+                        return [var, vcf, tbi, [] ]}
+                .set{ ch_files }
     }
 
 
@@ -63,22 +71,6 @@ workflow INPUT_CHECK {
 }
 
 def check_input(input){
-
-    // Function performs the following checks:
-    // 1. VCF file:
-    //    a. Check if the VCF column exists in samplesheet
-    //    b. Check if the VCF file exists
-    //    c. Check if the VCF file is bgzipped (meta.gzip_vcf = true)
-    //    d. Check if the VCF file is tabixed (meta.tabix_vcf = true)
-    //
-    //    when points c & d are true, bgzip/tabix the file for user
-    //
-    // 2. CNA file
-    //    < when mode == 'pcgr' >
-    //    a. Check CNA column exists in samplesheet
-    //    b. Check the CNA file exists
-    //    < when mode == 'cpsr' >
-    //    a. Output empty channel for CNA
 
     input.splitCsv(header:true, sep:',')
         .map{ row ->
@@ -137,15 +129,19 @@ def check_input(input){
 
                 // Capture metadata
                 def meta     = [:]
-                vcf          = file(row.vcf)
                 meta.patient = patient
                 meta.status  = status == "1" ? 'somatic' : 'germline'
+                meta.sample  = sample
 
                 // Capture tool name (users must follow sarek naming conventions)
                 // This is crucial for properly combining the outputs of BGZIP/TABIX
+                vcf = file(row.vcf)
                 filename = vcf.getName()
                 meta.tool = filename.toString().tokenize('.')[1]
                 if( meta.tool == 'strelka' ) { meta.tool = filename.tokenize('.')[1,2].join('.') }
+
+                // meta.id for process tags
+                meta.id = "${meta.patient}:${meta.sample}:${meta.tool}"
 
                 // Check if the VCF file is bgzipped
                 if(!vcf.toString().endsWith('.gz') && vcf.toString().endsWith('.vcf')){

@@ -1,5 +1,5 @@
-process FORMAT_VCF {
-    tag "${meta.id}:${meta.tool}"
+process REFORMAT_VCF {
+    tag "$meta.id"
     label 'process_low'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
@@ -16,7 +16,7 @@ process FORMAT_VCF {
     task.ext.when == null || task.ext.when
 
     script:
-    prefix = task.ext.prefix ?: "${meta.id}.${meta.tool}"
+    prefix = task.ext.prefix ?: "${meta.id}"
     """
     reformat_vcf.py \\
         reformat_vcf \\
@@ -25,7 +25,7 @@ process FORMAT_VCF {
     """
 }
 
-process FORMAT_CNA {
+process REFORMAT_CNA {
     tag "$meta.id"
     label 'process_low'
 

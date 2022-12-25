@@ -1,8 +1,8 @@
-include { BCFTOOLS_NORM   } from '../../modules/nf-core/bcftools/norm/main'
-include { BCFTOOLS_FILTER } from '../../modules/nf-core/bcftools/filter/main'
-include { TABIX_TABIX as TBX } from '../../modules/nf-core/tabix/tabix/main'
-include { FORMAT_VCF      } from '../../modules/local/PCGR/Format/pcgr_reformat'
-include { FORMAT_CNA      } from '../../modules/local/PCGR/Format/pcgr_reformat'
+include { BCFTOOLS_NORM as NORMALISE_VARIANTS } from '../../modules/nf-core/bcftools/norm/main'
+include { BCFTOOLS_FILTER as FILTER_VARIANTS  } from '../../modules/nf-core/bcftools/filter/main'
+include { TABIX_TABIX as TABIX_VARIANTS       } from '../../modules/nf-core/tabix/tabix/main'
+include { REFORMAT_VCF } from '../../modules/local/PCGR/Format/pcgr_reformat'
+include { REFORMAT_CNA } from '../../modules/local/PCGR/Format/pcgr_reformat'
 
 workflow FORMAT_FILES {
     take:
@@ -10,16 +10,16 @@ workflow FORMAT_FILES {
     files  // channel [ val(meta), [ vcf.gz] , [ vcf.gz.tbi ] ] OR [ val(meta), [vcf.gz], [vcf.gz.tbi], [CNA] ]
 
     main:
-    BCFTOOLS_NORM( files.map{ it -> return [ it[0], it[1], it[2] ] }, fasta )
-    BCFTOOLS_FILTER( BCFTOOLS_NORM.out.vcf )
-    TBX( BCFTOOLS_FILTER.out.vcf )
+    NORMALISE_VARIANTS( files.map{ it -> return [ it[0], it[1], it[2] ] }, fasta )
+    FILTER_VARIANTS( NORMALISE_VARIANTS.out.vcf )
+    TABIX_VARIANTS( FILTER_VARIANTS.out.vcf )
 
-    FORMAT_VCF( BCFTOOLS_FILTER.out.vcf.join( TBX.out.tbi ) )
-    FORMAT_CNA( files.map{ it -> return [ it[0], it[3] ]} )
+    REFORMAT_VCF( FILTER_VARIANTS.out.vcf.join( TABIX_VARIANTS.out.tbi ) )
+    REFORMAT_CNA( files.map{ it -> return [ it[0], it[3] ]} )
 
-    FORMAT_CNA.out.cna.view()
+    REFORMAT_CNA.out.cna.view()
 
-    files = params.cna_analysis ? FORMAT_VCF.out.vcf.join( FORMAT_CNA.out.cna ) : FORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
+    files = params.cna_analysis ? REFORMAT_VCF.out.vcf.join( REFORMAT_CNA.out.cna ) : REFORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
 
     emit:
     files
