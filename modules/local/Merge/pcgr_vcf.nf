@@ -1,5 +1,5 @@
 process PCGR_VCF {
-    tag "$meta.id"
+    tag "${meta.patient}:${meta.sample}"
     label 'process_medium'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

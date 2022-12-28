@@ -15,7 +15,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 //println(params.mode.toLowerCase())
 if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { exit 1, 'Please provide an input samplesheet or path to Sarek results' }
 if (params.mode.toLowerCase() == 'pcgr' && params.fasta) { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) }
-
+pcgr_header = Channel.fromPath("${projectDir}/bin/pcgr_header.txt", checkIfExists:true)
 if (params.database) { ch_pcgr_dir = Channel.fromPath("${params.database}/data/${params.genome.toLowerCase()}") } else { exit 1, "Please provide a path to the PCGR annotation database." }
 
 /*
@@ -73,7 +73,7 @@ workflow PCGR {
             ch_fasta.collect(), INPUT_CHECK.out.ch_files
         )
         FORMAT_FILES.out.files
-        MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect() )
+        MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect(), pcgr_header.collect() )
         RUN_PCGR(
             MERGE_VCFS.out.pcgr_ready_vcf,
             ch_pcgr_dir.collect()

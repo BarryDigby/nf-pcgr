@@ -1,5 +1,5 @@
 process PCGR {
-    tag "${meta.id}"
+    tag "${meta.patient}:${meta.sample}"
     label 'process_high'
 
     conda (params.enable_conda ? "pcgr::pcgr=1.2.0" : null)

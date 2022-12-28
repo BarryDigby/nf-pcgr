@@ -17,8 +17,6 @@ workflow FORMAT_FILES {
     REFORMAT_VCF( FILTER_VARIANTS.out.vcf.join( TABIX_VARIANTS.out.tbi ) )
     REFORMAT_CNA( files.map{ it -> return [ it[0], it[3] ]} )
 
-    REFORMAT_CNA.out.cna.view()
-
     files = params.cna_analysis ? REFORMAT_VCF.out.vcf.join( REFORMAT_CNA.out.cna ) : REFORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
 
     emit:

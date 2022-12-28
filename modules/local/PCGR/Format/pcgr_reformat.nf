@@ -26,7 +26,7 @@ process REFORMAT_VCF {
 }
 
 process REFORMAT_CNA {
-    tag "$meta.id"
+    tag "${meta.patient}:${meta.sample}:${cna}"
     label 'process_low'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
