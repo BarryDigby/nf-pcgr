@@ -18,7 +18,7 @@ workflow FORMAT_FILES {
     REFORMAT_CNA( files.map{ it -> return [ it[0], it[3] ]} )
 
     files = params.cna_analysis ? REFORMAT_VCF.out.vcf.join( REFORMAT_CNA.out.cna ) : REFORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
-
+    files.view()
     emit:
     files
 }

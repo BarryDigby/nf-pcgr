@@ -65,9 +65,10 @@ workflow INPUT_CHECK {
                 .set{ ch_files }
     }
 
+    ch_files.view()
 
     emit:
-    ch_files  // channel: [ [meta:id], vcf.gz, vcf.gz.tbi, [] ] OR [ [meta:id], vcf.gz, vcf.gz.tbi, CNA ]
+    ch_files  // channel: [ [meta], vcf.gz, vcf.gz.tbi, [] ] OR [ [meta], vcf.gz, vcf.gz.tbi, CNA ]
 }
 
 def check_input(input){
@@ -161,35 +162,29 @@ def check_input(input){
                     tbi = [ file(tbi) ]
                 }
 
-                // CNA only available in PCGR mode
-                if(params.mode.toLowerCase() == 'pcgr'){
+                // CNA only available in PCGR
+                // Error logging for invalid CNA files etc.
+                if(meta.status == 'somatic' && params.cna_analysis){
 
                     // Stage CNA (NA in samplesheet evals as null. Explicitly set as 'NA' here)
                     if (row.cna) cna = file(row.cna)
                     else cna = 'NA'
 
-                    // If user does not select CNA_analysis, output empty slot in channel.
-                    if(!params.cna_analysis){
-                        // Output PCGR channel with empty slot for CNA (so process does not complain about input cardinality)
-                        return [ meta, [ file(vcf) ], tbi, [] ]
-                    }
-
                     // If user selects params.cna_analysis but the entries are NA or not valid, exit.
-                    if(params.cna_analysis && cna == 'NA'){
+                    if(cna == 'NA'){
                         // Produce Error message, user wants CNA analysis but did not provide file
-                        log.error('ERROR: CNA analysis selected but no copy number alteration files provided in samplesheet.')
+                        log.error('ERROR: CNA analysis selected but no copy number alteration files provided with somatic VCF files in samplesheet.')
                         System.exit(1)
-                    }else if(params.cna_analysis && !file(cna).exists()){
+                    }else if(!file(cna).exists()){
                         // Produce Error message, user wants CNA analysis but did not provide valid file
                         log.error('ERROR: CNA analysis selected but copy numer alteration file ' + row.cna.toString() + ' does not exist.')
                         System.exit(1)
-                    }else{
-                        // Valid file for CNA? Output the final channel
-                        return [ meta, [ file(vcf) ], tbi, [ file(cna) ] ]
                     }
                 }
                 // File channel for CPSR
-                return  [ meta, [ file(vcf) ], tbi ]
+                // cna file checks have been run above
+                cna_handling = ( meta.status == 'somatic' && file(cna).exists() ) ? [ file(cna) ] : []
+                return  [ meta, [ file(vcf) ], tbi, cna_handling ]
             }
         }
         .set{ files }
