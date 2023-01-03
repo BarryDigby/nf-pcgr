@@ -7,23 +7,23 @@ workflow INPUT_CHECK {
     ch_input // staged as file object using file(params.input)
 
     main:
-    if( ch_input.toString().endsWith('.csv') ){
-        samplesheet = Channel.of(ch_input)
-        check_input(samplesheet)
-    }else{
-        sarek_files = collect_sarek_files(ch_input)
-        sarek_files.collectFile( name: 'constructed_samplesheet.csv', newLine:false, storeDir: "${params.outdir}/pipeline_info", keepHeader: true ){ ids, vcf, cna -> "sample,vcf,cna" + "\n" + "$ids,$vcf,$cna" + "\n"}.set{ constructed_samplesheet }
-        samplesheet = constructed_samplesheet.map{ it ->
-                                                    samp_file = file(it)
-                                                    return samp_file }
-        check_input(samplesheet)
-    }
+    samplesheet = Channel.of(ch_input)
+    check_input(samplesheet)
+
+    samplesheet_files.multiMap{ meta, vcf, tbi, cna ->
+                                vcf_files : [ meta, vcf, tbi ]
+                                cna_files : [ meta, cna ]
+                                }.set{ files }
+
+    // simplify meta for CNA files, need to recombine after variant calling tools have been merged.
+    vcf_files = files.vcf_files
+    ch_cna_files = files.cna_files.map{ meta, cna -> var = [:]; var.patient = meta.patient; var.status = meta.status; var.sample = meta.sample; return [ meta, cna ] }
 
     // Determine if vcf files need to be bgzipped and or tabixed.
     // 0: meta, 1: vcf, 2: tbi, 3: cna.
-    // must use it instead of names here due to different input tuple len for modes.
-    BGZIP_INPUT_VCF( files.map{ it -> [it[0], it[1]]} )
-    TABIX_INPUT_VCF( files.map{ it -> [it[0], it[1]]} )
+     // must use it instead of names here due to different input tuple len for modes.
+    BGZIP_INPUT_VCF( vcf_files.map{ it -> [it[0], it[1]]} )
+    TABIX_INPUT_VCF( vcf_files.map{ it -> [it[0], it[1]]} )
 
     // If procs were not run, flatten takes care of ifEmpty([]) in step below.
     ch_tabix_bgzip = BGZIP_INPUT_VCF.out.gz_tbi.ifEmpty([])
@@ -32,43 +32,24 @@ workflow INPUT_CHECK {
     // Step 3.
     // Using meta as the grouping key, combine the newly bgzipped/tabixed VCF files appropriately.
     // Catch here is to remove the original raw VCF using flatten + filter. Restore tuple using collate.
-    // Made the decision to use the same input tuple for (!params.cna_analysis && params.mode = 'cpsr')
-    if(params.cna_analysis){
-        files.mix(ch_tabix_bgzip, ch_tabix_tabix)
-                .groupTuple(by: 0)
-                .flatten()
-                .filter{ it -> !it.toString().endsWith('.vcf')}
-                .collate(4, false)
-                .map{ meta, vcf, tbi, cna ->
+    vcf_files.mix( ch_tabix_bgzip, ch_tabix_tabix )
+            .groupTuple(by: 0)
+            .flatten()
+            .filter{ it -> !it.toString().endsWith('.vcf')}
+            .collate(3, false)
+            .map{ meta, vcf, tbi ->
                         var = [:]
                         var.id      = meta.id
                         var.patient = meta.patient
                         var.status  = meta.status
                         var.sample  = meta.sample
                         var.tool    = meta.tool
-                        return [var, vcf, tbi, cna]}
-                .set{ ch_files }
-    }else{
-        files.mix(ch_tabix_bgzip, ch_tabix_tabix)
-                .groupTuple(by: 0)
-                .flatten()
-                .filter{ it -> !it.toString().endsWith('.vcf')}
-                .collate(3, false)
-                .map{ meta, vcf, tbi ->
-                        var = [:]
-                        var.id      = meta.id
-                        var.patient = meta.patient
-                        var.status  = meta.status
-                        var.sample  = meta.sample
-                        var.tool    = meta.tool
-                        return [var, vcf, tbi, [] ]}
-                .set{ ch_files }
-    }
-
-    ch_files.view()
+                        return [var, vcf, tbi ]}
+                .set{ ch_vcf_files }
 
     emit:
-    ch_files  // channel: [ [meta], vcf.gz, vcf.gz.tbi, [] ] OR [ [meta], vcf.gz, vcf.gz.tbi, CNA ]
+    ch_vcf_files // channel: [ [meta], vcf.gz, vcf.gz.tbi ]
+    ch_cna_files //  channel: [meta, cna]
 }
 
 def check_input(input){
@@ -142,7 +123,7 @@ def check_input(input){
                 if( meta.tool == 'strelka' ) { meta.tool = filename.tokenize('.')[1,2].join('.') }
 
                 // meta.id for process tags
-                meta.id = "${meta.patient}:${meta.sample}:${meta.tool}"
+                meta.id = "${meta.patient}.${meta.sample}.${meta.tool}"
 
                 // Check if the VCF file is bgzipped
                 if(!vcf.toString().endsWith('.gz') && vcf.toString().endsWith('.vcf')){
@@ -183,34 +164,9 @@ def check_input(input){
                 }
                 // File channel for CPSR
                 // cna file checks have been run above
-                cna_handling = ( meta.status == 'somatic' && file(cna).exists() ) ? [ file(cna) ] : []
-                return  [ meta, [ file(vcf) ], tbi, cna_handling ]
+                cna_handling = ( meta.status == 'somatic' && params.cna_analysis ) ? file(cna) : []
+                return [ meta, [ file(vcf) ], tbi, cna_handling ]
             }
         }
-        .set{ files }
+        .set{ samplesheet_files }
 }
-
-// Important the user sets params.cna_analysis to false if CNVkit was not used in Sarek.
-def collect_sarek_files(input){
-    // Init empty array outside eachFileRecurse scope
-    vcf_files = []
-    cna_files = []
-    input.eachFileRecurse{ it ->
-        // match tumor vs normal VCF files
-        vcf = it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ? file(it) : []
-        // Match CNVkit output file OR produce NA for samplesheet
-        if(params.cna_analysis){ cna = it.name.contains('.cns') ? file(it) : [] }else{ cna = 'NA' }
-        // Only grab IDs for VCF or CNVkit file, else NA
-        ids = ( it.name.contains('.cns') || it.name.contains('_vs_') && ( it.name.endsWith('.vcf') || it.name.endsWith('.vcf.gz') ) && !it.name.endsWith('.tbi') ) ? it.simpleName.tokenize('_')[0] : 'NA'
-        vcf_files << [ ids, vcf ]
-        cna_files << [ ids, cna ]
-        }
-    // Filter out the empty tuple slots '[]' in VCF array i.e select appropriate files
-    collect_vcf = Channel.fromList( vcf_files ).filter{ ids, vcf -> vcf.toString().contains('.vcf') }
-    // As above, with catch for no CNVkit files.
-    collect_cna = params.cna_analysis ? Channel.fromList( cna_files ).filter{ ids, cna -> cna.toString().contains('.cns') } : Channel.fromList( cna_files )
-    // looking here because workflow exists with no CNS files? Check that --cna_analysis is false!
-    sarek_files = collect_vcf.combine(collect_cna, by:0).unique()
-    return sarek_files
-}
-

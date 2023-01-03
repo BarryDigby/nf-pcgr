@@ -59,30 +59,24 @@ workflow PCGR {
     ch_versions = Channel.empty()
 
     // Read samplesheet/directory, create channel with meta.id, vcf, vcf_tbi, cna file
-    INPUT_CHECK (
-        ch_input
-    )
+    INPUT_CHECK ( ch_input )
 
-    // TODO: Run CSPR and give outputs to pcgr. diverging these procs based on params.mode not sensible
+    FORMAT_FILES ( ch_fasta.collect(), INPUT_CHECK.out.ch_vcf_files, INPUT_CHECK.out.ch_cna_files )
 
-    // Automatically add INFO and HEADER fields to somatic VCF files
-    // Detect CNA tool used and format for PCGR
-    // RUN PCGR
-    if(params.mode.toLowerCase() == 'pcgr'){
-        FORMAT_FILES(
-            ch_fasta.collect(), INPUT_CHECK.out.ch_files
+    MERGE_VCFS ( FORMAT_FILES.out.somatic_files, FORMAT_FILES.out.normalised_germline, ch_fasta.collect(), pcgr_header.collect(), ch_pcgr_dir.collect() )
+
+        /* FORMAT_FILES(
+            ch_fasta.collect(), INPUT_CHECK.out.ch_vcf_files, INPUT_CHECK
         )
         FORMAT_FILES.out.files
         MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect(), pcgr_header.collect() )
         RUN_PCGR(
             MERGE_VCFS.out.pcgr_ready_vcf,
             ch_pcgr_dir.collect()
-        )
-    }
-
-    if(params.mode.toLowerCase() == 'cpsr') RUN_CPSR( INPUT_CHECK.out.ch_files, ch_pcgr_dir.collect() )
-
+        ) */
 }
+
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
