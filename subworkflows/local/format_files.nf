@@ -12,14 +12,14 @@ workflow FORMAT_FILES {
     cna_files
 
     main:
-    // CPSR can take raw input germline files, but we will normalise them anyway.
+    // CPSR can take raw input germline files, but we will normalise them.
     // PCGR requires somatic VCF files to be simplified to TAF, TDP, NAF, NDP fields
     // which requires removing empty DP fields (filter) and manual calculations.
 
     NORMALISE_VARIANTS( vcf_files, fasta )
     TABIX_NORMALISED( NORMALISE_VARIANTS.out.vcf )
     normalised_germline = NORMALISE_VARIANTS.out.vcf.join( TABIX_NORMALISED.out.tbi ).filter{ it -> meta = it[0]; meta.status == 'germline' }
-    normalised_somatic = NORMALISE_VARIANTS.out.vcf.join( TABIX_NORMALISED.out.tbi ).filter{ it -> meta = it[0]; meta.status == 'somatic' }
+    normalised_somatic  = NORMALISE_VARIANTS.out.vcf.join( TABIX_NORMALISED.out.tbi ).filter{ it -> meta = it[0]; meta.status == 'somatic' }
 
     FILTER_VARIANTS( normalised_somatic.map{ it -> return [ it[0], it[1] ] } )
     TABIX_FILTERED( FILTER_VARIANTS.out.vcf )
@@ -27,7 +27,9 @@ workflow FORMAT_FILES {
     REFORMAT_VCF( FILTER_VARIANTS.out.vcf.join( TABIX_FILTERED.out.tbi ) )
     REFORMAT_CNA( cna_files )
 
-    somatic_files = params.cna_analysis ? REFORMAT_VCF.out.vcf.join( REFORMAT_CNA.out.cna ) : REFORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }.view()
+    copy_number = REFORMAT_CNA.out.cna.map{ meta, tsv -> var = [:]; var.id = meta.id; var.patient = meta.patient; var.status = meta.status; var.sample = meta.sample; var.tool = meta.tool; return [ var, tsv ] }
+
+    somatic_files = params.cna_analysis ? REFORMAT_VCF.out.vcf.join( copy_number ) : REFORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }.view()
 
     emit:
     somatic_files

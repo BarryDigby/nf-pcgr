@@ -1,20 +1,10 @@
 #!/usr/bin/env nextflow
 
 
-mutect21 = Channel.of([
-        'HCC2400T',
-        [file("HCC2400T.mutect2.vcf.gz"),
-        file("HCC2400T.mutect2.vcf.gz.tbi")],
-        file("HCC2400T.cns")
-    ])
+mutect2 = Channel.of( [ [ 'id:HCC2400T', 'sample:0', 'patient:200', 'lalala:foo' ], file("HCC2400T.mutect2.vcf.gz"), file("HCC2400T.mutect2.vcf.gz.tbi"), file("HCC2400T.cns") ])
 
-strelka_snv  = Channel.of([
-        'HCC1400T',
-        [file("HCC1400T.strelka.somatic_snv.vcf.gz"),
-        file("HCC1400T.strelka.somatic_snv.vcf.gz.tbi")],
-        file("HCC1400T.cns")
-    ])
+mutect2.map{ meta, f1, f2, f3 -> return [ meta[0..2], f1 ] }.view()
 
 
 
-foo = mutect21.mix(strelka_snv).flatten().collect().view()
+

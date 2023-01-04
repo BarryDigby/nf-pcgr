@@ -1,5 +1,5 @@
 process CPSR {
-    tag "$meta.id"
+    tag "${meta.patient}.${meta.sample}"
     label 'process_medium'
 
     conda (params.enable_conda ? "pcgr::pcgr=1.2.0" : null)
@@ -8,13 +8,12 @@ process CPSR {
         'docker.io/sigven/pcgr:1.2.0' }"
 
     input:
-    // tuple [ meta, [vcf] , [vcf.tbi] ]
-    tuple val(meta), path(vcf), path(tbi), path(cna)
+    tuple val(meta), path(vcf)
     path(pcgr_dir), stageAs: "PCGR/data/${params.genome.toLowerCase()}"
 
     output:
     path "versions.yml"           , emit: versions
-    tuple val(meta), path("${meta.id}"), emit: cpsr_reports
+    tuple val(meta), path("${meta.patient}.${meta.sample}"), emit: cpsr_reports
 
     when:
     task.ext.when == null || task.ext.when

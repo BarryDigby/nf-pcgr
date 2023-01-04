@@ -7,7 +7,7 @@ process PCGR_VCF {
         'docker.io/barryd237/pysam-xcmds:latest' }"
 
     input:
-    tuple val(meta), path(keys), path(files)
+    tuple val(meta), path(keys), path(vcf), path(tbi)
     path(pcgr_header)
 
     output:

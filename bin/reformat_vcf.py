@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 from pysam import VariantFile
+import subprocess
 import os
 
 # Inspired by: @gudeqing
@@ -80,7 +81,7 @@ def reformat_vcf(vcf_file, out):
         header.formats.add('AL', number='.', type='Integer', description='Codes for algorithms that produced the somatic call (1 = mutect2, 2 = freebayes, 3 = strelka)')
         if 'strelka' in fnc_str:
             header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
-        with VariantFile('tmp_1.vcf', 'w', header=header) as fw:
+        with VariantFile('tmp_.vcf', 'w', header=header) as fw:
             tumor_is_first = 0
             tumor_is_second = 0
             algorithm = fnc_str.split('_', 1)[0]
@@ -115,8 +116,15 @@ def reformat_vcf(vcf_file, out):
                 f.write(f'{tumor}\n{normal}')
 
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
-    os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
-    #os.remove('tmp_.vcf')
+    os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_.vcf > tmp_1.vcf')
+    # PCGR does not use non PASS variants. remove them now so they are not involved in downstream averaging.
+    # add a catch here for the trvial test datasets
+    catch = subprocess.run(['bcftools', 'filter -i\'FILTER=PASS\' tmp_1.vcf --output {out}'])
+    if catch.returncode != 0:
+        os.rename('tmp_1.vcf', f'{out}')
+        os.system(f'touch tmp_1.vcf')
+
+    os.remove('tmp_.vcf')
     os.remove('tmp_1.vcf')
     os.system(f'bgzip {out}')
     os.system(f'tabix {out}.gz')

@@ -51,29 +51,20 @@ include { CPSR as RUN_CPSR } from '../modules/local/PCGR/Run/cpsr'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// Info required for completion email and summary
 def multiqc_report = []
 
 workflow PCGR {
 
     ch_versions = Channel.empty()
 
-    // Read samplesheet/directory, create channel with meta.id, vcf, vcf_tbi, cna file
     INPUT_CHECK ( ch_input )
 
     FORMAT_FILES ( ch_fasta.collect(), INPUT_CHECK.out.ch_vcf_files, INPUT_CHECK.out.ch_cna_files )
 
     MERGE_VCFS ( FORMAT_FILES.out.somatic_files, FORMAT_FILES.out.normalised_germline, ch_fasta.collect(), pcgr_header.collect(), ch_pcgr_dir.collect() )
 
-        /* FORMAT_FILES(
-            ch_fasta.collect(), INPUT_CHECK.out.ch_vcf_files, INPUT_CHECK
-        )
-        FORMAT_FILES.out.files
-        MERGE_VCFS( FORMAT_FILES.out.files, ch_fasta.collect(), pcgr_header.collect() )
-        RUN_PCGR(
-            MERGE_VCFS.out.pcgr_ready_vcf,
-            ch_pcgr_dir.collect()
-        ) */
+    RUN_CPSR( MERGE_VCFS.out.cpsr_ready_vcf, ch_pcgr_dir.collect() )
+
 }
 
 
