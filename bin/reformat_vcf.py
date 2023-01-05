@@ -62,12 +62,12 @@ vcf_formats = { "mutect2_vaf": ['AD', 'AF', 'DP', 'F1R2', 'F2R1', 'FAD', 'GQ', '
 
 def reformat_vcf(vcf_file, out):
     """
-    BCFtools: split multi-allelic sites, normalize and remove sites where DP is missing or < 1. (divide by zero errors).
-    Calculations need to be cross checked with someone with more experience in population genomics.
+    BCFtools: Must remove records where DP is missing "." for T or N sample.
+    Would like calculations need to be cross checked with someone with more experience in population genomics.
     BCFtools: reformatting sample names to NORMAL, TUMOR for downstream merging.
     """
-    #os.system(f'bcftools norm -f {reference} -m -both {vcf_file} | bcftools filter -e\'FORMAT/DP="." || FORMAT/DP<1\' -o tmp_.vcf')
-    with VariantFile(vcf_file) as fr:
+    os.system(f'bcftools filter -e\'FORMAT/DP="."\' {vcf_file} -o tmp_.vcf')
+    with VariantFile("tmp_.vcf") as fr:
         header = fr.header
         header.info.add('TDP', number=1, type='Integer', description='Tumor sample depth')
         header.info.add('NDP', number=1, type='Integer', description='Normal sample depth')
@@ -81,7 +81,7 @@ def reformat_vcf(vcf_file, out):
         header.formats.add('AL', number='.', type='Integer', description='Codes for algorithms that produced the somatic call (1 = mutect2, 2 = freebayes, 3 = strelka)')
         if 'strelka' in fnc_str:
             header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
-        with VariantFile('tmp_.vcf', 'w', header=header) as fw:
+        with VariantFile('tmp_1.vcf', 'w', header=header) as fw:
             tumor_is_first = 0
             tumor_is_second = 0
             algorithm = fnc_str.split('_', 1)[0]
@@ -116,13 +116,13 @@ def reformat_vcf(vcf_file, out):
                 f.write(f'{tumor}\n{normal}')
 
     print(f'we guess tumor sample is {samples[tumor_idx]} ')
-    os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_.vcf > tmp_1.vcf')
+    os.system(f'bcftools reheader -s bcftools_reheader.txt tmp_1.vcf > {out}')
     # PCGR does not use non PASS variants. remove them now so they are not involved in downstream averaging.
     # add a catch here for the trvial test datasets
-    catch = subprocess.run(['bcftools', 'filter -i\'FILTER=PASS\' tmp_1.vcf --output {out}'])
-    if catch.returncode != 0:
-        os.rename('tmp_1.vcf', f'{out}')
-        os.system(f'touch tmp_1.vcf')
+    #catch = subprocess.run(['bcftools', 'filter -i\'FILTER=PASS\' tmp_1.vcf --output {out}'])
+    #if catch.returncode != 0:
+    #    os.rename('tmp_1.vcf', f'{out}')
+    #    os.system(f'touch tmp_1.vcf')
 
     os.remove('tmp_.vcf')
     os.remove('tmp_1.vcf')

@@ -46,6 +46,8 @@ def pcgr_ready_vcf(sample):
     # removing duplicate lines should have the same affect on len() as averaging.
     # run a quick sanity check
     master_df = pd.concat(list(vcf_dict.values()))
+    # Keep rs SNP ids if they are present
+    master_df = master_df.sort_values('ID', ascending=False)
     master_df = master_df[~master_df.index.duplicated(keep='first')]
 
     assert len(avg_df) == len(master_df), 'averaged values dataframe does not match master dataframe with duplicate index vals removed'
