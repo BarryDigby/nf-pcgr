@@ -63,6 +63,10 @@ workflow PCGR {
 
     MERGE_VCFS ( FORMAT_FILES.out.somatic_files, FORMAT_FILES.out.normalised_germline, ch_fasta.collect(), pcgr_header.collect(), ch_pcgr_dir.collect() )
 
+    MERGE_VCFS.out.pcgr_ready_vcf.view()
+
+    RUN_PCGR( MERGE_VCFS.out.pcgr_ready_vcf, ch_pcgr_dir.collect() )
+
     RUN_CPSR( MERGE_VCFS.out.cpsr_ready_vcf, ch_pcgr_dir.collect() )
 
 }

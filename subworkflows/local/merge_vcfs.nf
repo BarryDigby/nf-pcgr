@@ -18,22 +18,19 @@ workflow MERGE_VCFS {
     CPSR_VALIDATE_INPUT( germline_files, pcgr_dir.collect() )
     TABIX_BGZIPTABIX( CPSR_VALIDATE_INPUT.out.validated_vcf )
 
-
-
-
     // create master TSV file with variant <-> tool mapping
     // Extract VCF and TBI from channel, choose suitable meta info for merging samples (pop meta.tool, meta.status)
     // < [[ meta.patient, meta.sample], all tool vcfs, all tool tbi ]
-    per_sample_somatic_vcfs = somatic_files.map{ it -> return it[0..2] }.map{ meta, vcf, tbi -> var = [:]; var.patient = meta.patient; var.sample = meta.sample; return [ var, vcf, tbi ] }.groupTuple()
+    per_sample_somatic = somatic_files.map{ meta, vcf, tbi, cna -> var = [:]; var.patient = meta.patient; var.sample = meta.sample; return [ var, vcf, tbi, cna ] }
+    per_sample_somatic_vcfs = per_sample_somatic.map{ meta, vcf, tbi, cna -> return [ var, vcf, tbi ] }.groupTuple()
     INTERSECT_SOMATIC_VARIANTS( per_sample_somatic_vcfs )
 
-    // merge mapping key back with sample VCFs, produce PCGR ready VCFs. -- massaging to remove lists introduced by grouptuple
+    // merge mapping key back with sample VCFs, produce PCGR ready VCFs.
     sample_vcfs_keys = INTERSECT_SOMATIC_VARIANTS.out.variant_tool_map.join(per_sample_somatic_vcfs)
 
     PCGR_READY_VCF( sample_vcfs_keys, pcgr_header )
 
-    // Add the CNVkit file back to the PCGR ready VCFs
     emit:
-    pcgr_ready_vcf = params.cna_analysis ? PCGR_READY_VCF.out.vcf.join( somatic_files.map{ it -> return it[3] }.flatten().take(1).map{ it -> meta = [:]; meta.id = it.simpleName; return [ meta, it ] } ) : PCGR_READY_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
+    pcgr_ready_vcf = params.cna_analysis ? PCGR_READY_VCF.out.vcf.join( per_sample_somatic.map{ meta, vcf, tbi, cna -> return [ meta, cna ] } ) : PCGR_READY_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
     cpsr_ready_vcf = CPSR_VALIDATE_INPUT.out.validated_vcf
 }

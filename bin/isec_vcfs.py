@@ -13,10 +13,11 @@ def intersect_variants(sample):
     sample_files = os.listdir("./")
     sample_files = list(filter(r.match, sample_files))
     sample_files = [ file for file in sample_files if not file.endswith(suffixes) ]
+    print(sample_files)
 
     tool_names = {}
     for idx, file in enumerate(sample_files):
-        tool = file.split(".")[1]
+        tool = file.split(".")[2] # change this if you change prefix
         tool_names[idx] = tool
 
     if len(sample_files) > 1:
