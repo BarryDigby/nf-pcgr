@@ -51,6 +51,26 @@ def strelka_indel_vaf(record, sample_idx):
     record.samples[sample_idx]['AD'] = [0, tier1AltCounts]
     return VAF
 
+
+## Strelka TAL = alternative allele, usually the reference
+## Strelka TIL = Indel i.e the 'ALT'.
+## using tier one [0] as per strelka recommendation.
+def strelka_indel_allelic_depth(record, sample_idx):
+    tmp_REF = ''.join([s.strip() for s in str(record.samples[sample_idx]['TAR'][0])])
+    REF = tmp_REF.replace('(', '').replace(')', '')
+    tmp_ALT = ''.join([s.strip() for s in str(record.samples[sample_idx]['TIR'][0])])
+    ALT = tmp_ALT.replace('(', '').replace(')', '')
+    return f'{REF},{ALT}'
+
+def strelka_snv_allelic_depth(record, sample_idx):
+    ref = str(record.ref + "U")
+    alt = str(record.alts[0] + "U")
+    tmp_REF = ''.join([s.strip() for s in str(record.samples[sample_idx][ref][0])])
+    REF = tmp_REF.replace('(', '').replace(')', '')
+    tmp_ALT = ''.join([s.strip() for s in str(record.samples[sample_idx][alt][0])])
+    ALT = tmp_ALT.replace('(', '').replace(')', '')
+    return f'{REF},{ALT}'
+
 vcf_formats = { "mutect2_vaf": ['AD', 'AF', 'DP', 'F1R2', 'F2R1', 'FAD', 'GQ', 'GT', 'PGT', 'PID', 'PL', 'PS', 'SB'],
                 "freebayes_vaf": ['AD', 'AO', 'DP', 'GL', 'GQ', 'GT', 'MIN_DP', 'PL', 'QA', 'QR', 'RO'],
                 "strelka_snv_vaf": ['AU', 'CU', 'DP', 'FDP', 'GU', 'SDP', 'SUBDP', 'TU'],
@@ -73,19 +93,21 @@ def reformat_vcf(vcf_file, out):
         header.info.add('NDP', number=1, type='Integer', description='Normal sample depth')
         header.info.add('TAF', number=1, type='Float', description='Tumor sample AF')
         header.info.add('NAF', number=1, type='Float', description='Normal sample AF')
+        header.info.add('ADT', number='.', type='String',  description="Allelic depths for the ref and alt alleles in the order listed (tumor)")
+        header.info.add('ADN', number='.', type='String',  description="Allelic depths for the ref and alt alleles in the order listed (normal)")
         header.info.add('TAL', number='.', type='String', description='Algorithms that called the somatic mutation')
         samples = list(header.samples)
         formats = list(header.formats)
         fnc_str = list(vcf_formats.keys())[list(vcf_formats.values()).index(list(formats))]
         # append after algorithm-function mapping
-        header.formats.add('AL', number='.', type='Integer', description='Codes for algorithms that produced the somatic call (1 = mutect2, 2 = freebayes, 3 = strelka)')
+        header.formats.add('AL', number='.', type='Integer', description='Codes for algorithms that produced the somatic call (1 = freebayes, 2 = mutect2, 3 = strelka)')
         if 'strelka' in fnc_str:
             header.formats.add('AD', number=2, type="Integer", description='AD flag for Strelka. Output as tuple so index rule for TAF does not need to be modified.')
         with VariantFile('tmp_1.vcf', 'w', header=header) as fw:
             tumor_is_first = 0
             tumor_is_second = 0
             algorithm = fnc_str.split('_', 1)[0]
-            algorithm_code = 1 if algorithm == 'mutect2' else 2 if algorithm == 'freebayes' else 3
+            algorithm_code = 1 if algorithm == 'freebayes' else 2 if algorithm == 'mutect2' else 3
             for record in fr:
                 VAF_sample0 = globals()[fnc_str](record, 0)
                 VAF_sample1 = globals()[fnc_str](record, 1)
@@ -97,8 +119,24 @@ def reformat_vcf(vcf_file, out):
                 normal_idx = 1 - tumor_idx
                 record.info['TDP'] = record.samples[tumor_idx]['DP']
                 record.info['NDP'] = record.samples[normal_idx]['DP']
-                record.info['TAF'] = round(record.samples[tumor_idx]['AD'][1]/record.samples[tumor_idx]['DP'], 3)
-                record.info['NAF'] = round(record.samples[normal_idx]['AD'][1]/record.samples[normal_idx]['DP'], 3)
+                AF = [VAF_sample0, VAF_sample1]
+                record.info['TAF'] = round(AF[tumor_idx], 3)
+                record.info['NAF'] = round(AF[normal_idx], 3)
+                if fnc_str == 'strelka_indel_vaf':
+                    record.info['ADT'] = strelka_indel_allelic_depth(record, tumor_idx)
+                    record.info['ADN'] = strelka_indel_allelic_depth(record, normal_idx)
+                elif fnc_str == 'strelka_snv_vaf':
+                    record.info['ADT'] = strelka_snv_allelic_depth(record, tumor_idx)
+                    record.info['ADN'] = strelka_snv_allelic_depth(record, normal_idx)
+                else:
+                    # painful manipulation of the tuple returned e.g ( 74, 2 )
+                    tmp = ''.join([s.strip() for s in str(record.samples[tumor_idx]['AD'])])
+                    record.info['ADT'] = tmp.replace('(', '').replace(')', '')
+                    tmp = ''.join([s.strip() for s in str(record.samples[normal_idx]['AD'])])
+                    record.info['ADN'] = tmp.replace('(', '').replace(')', '')
+                # not sure what you were thinking below! You already calculted AF for each sample!
+                #record.info['TAF'] = round(record.samples[tumor_idx]['AD'][1]/record.samples[tumor_idx]['DP'], 3)
+                #record.info['NAF'] = round(record.samples[normal_idx]['AD'][1]/record.samples[normal_idx]['DP'], 3)
                 record.info['TAL'] = algorithm
                 record.samples[tumor_idx]['AL'] = algorithm_code
                 record.samples[normal_idx]['AL'] = algorithm_code
