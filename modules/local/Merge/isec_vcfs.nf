@@ -11,6 +11,7 @@ process ISEC_SOMATIC_VCFS {
 
     output:
     tuple val(meta), path("${prefix}_keys.txt"), emit: variant_tool_map
+    path "versions.yml"                        , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -21,5 +22,10 @@ process ISEC_SOMATIC_VCFS {
     """
     isec_vcfs.py \
         -sample ${prefix}
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr//g' ))
+    END_VERSIONS
     """
 }

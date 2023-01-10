@@ -4,9 +4,10 @@ include { TABIX_BGZIPTABIX as BGZIP_INPUT_VCF } from '../../modules/nf-core/tabi
 
 workflow INPUT_CHECK {
     take:
-    ch_input // staged as file object using file(params.input)
+    ch_input
 
     main:
+    ch_versions = Channel.empty()
     samplesheet = Channel.of(ch_input)
     check_input(samplesheet)
 
@@ -15,24 +16,17 @@ workflow INPUT_CHECK {
                                 cna_files : [ meta, cna ]
                                 }.set{ files }
 
-    // simplify meta for CNA files, need to recombine after variant calling tools have been merged.
+    // simplify metadata in CNA channels for re-merging to processed VCF files.
     vcf_files = files.vcf_files
     ch_cna_files = files.cna_files.map{ meta, cna -> var = [:]; var.patient = meta.patient; var.status = meta.status; var.sample = meta.sample; return [ meta, cna ] }
 
-    // Determine if vcf files need to be bgzipped and or tabixed.
-    // 0: meta, 1: vcf, 2: tbi, 3: cna.
-     // must use it instead of names here due to different input tuple len for modes.
-    BGZIP_INPUT_VCF( vcf_files.map{ it -> [it[0], it[1]]} )
-    TABIX_INPUT_VCF( vcf_files.map{ it -> [it[0], it[1]]} )
+    // BGZIP/TABIX based on metadata generated from samplesheet scan.
+    BGZIP_INPUT_VCF( vcf_files.map{ meta, vcf, tbi -> [ meta, vcf ] } )
+    TABIX_INPUT_VCF( vcf_files.map{ meta, vcf, tbi -> [ meta, vcf ] } )
 
-    // If procs were not run, flatten takes care of ifEmpty([]) in step below.
-    ch_tabix_bgzip = BGZIP_INPUT_VCF.out.gz_tbi.ifEmpty([])
-    ch_tabix_tabix = TABIX_INPUT_VCF.out.tbi.ifEmpty([])
-
-    // Step 3.
     // Using meta as the grouping key, combine the newly bgzipped/tabixed VCF files appropriately.
     // Catch here is to remove the original raw VCF using flatten + filter. Restore tuple using collate.
-    vcf_files.mix( ch_tabix_bgzip, ch_tabix_tabix )
+    vcf_files.mix( BGZIP_INPUT_VCF.out.gz_tbi.ifEmpty([]), TABIX_INPUT_VCF.out.tbi.ifEmpty([]) )
             .groupTuple(by: 0)
             .flatten()
             .filter{ it -> !it.toString().endsWith('.vcf')}
@@ -47,9 +41,13 @@ workflow INPUT_CHECK {
                         return [var, vcf, tbi ]}
                 .set{ ch_vcf_files }
 
+    ch_versions = ch_versions.mix( BGZIP_INPUT_VCF.out.versions )
+    ch_versions = ch_versions.mix( TABIX_INPUT_VCF.out.versions )
+
     emit:
     ch_vcf_files // channel: [ [meta], vcf.gz, vcf.gz.tbi ]
     ch_cna_files //  channel: [meta, cna]
+    versions = ch_versions
 }
 
 def check_input(input){

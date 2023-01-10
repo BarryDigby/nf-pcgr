@@ -13,6 +13,7 @@ process CPSR_VALIDATE_INPUT {
 
     output:
     tuple val(meta), path("${prefix}/*cpsr_ready.vcf"), emit: validated_vcf
+    path "versions.yml"                               , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -36,5 +37,10 @@ process CPSR_VALIDATE_INPUT {
         0 \\
         --output_dir $prefix \\
         --debug
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr //g' ))
+    END_VERSIONS
     """
 }

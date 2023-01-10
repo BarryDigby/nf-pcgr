@@ -8,12 +8,12 @@ process CPSR {
         'docker.io/sigven/pcgr:1.2.0' }"
 
     input:
-    tuple val(meta), path(vcf)
+    tuple val(meta), path(vcf), path(tbi)
     path(pcgr_dir), stageAs: "PCGR/data/${params.genome.toLowerCase()}"
 
     output:
-    path "versions.yml"           , emit: versions
     tuple val(meta), path("${meta.patient}.${meta.sample}"), emit: cpsr_reports
+    path "versions.yml"           , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -36,7 +36,7 @@ process CPSR {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr//g' ))
+        pcgr: \$(echo \$( cpsr --version | sed 's/cpsr //g' ))
     END_VERSIONS
     """
 }

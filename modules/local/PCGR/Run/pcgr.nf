@@ -38,7 +38,7 @@ process PCGR {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr//g' ))
+        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr //g' ))
     END_VERSIONS
     """
 }

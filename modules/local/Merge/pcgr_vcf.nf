@@ -12,6 +12,7 @@ process PCGR_VCF {
 
     output:
     tuple val(meta), path("${prefix}.vcf.gz"), path("${prefix}.vcf.gz.tbi"), emit: vcf
+    path "versions.yml"                                                    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,5 +23,10 @@ process PCGR_VCF {
     """
     pcgr_vcf.py \
         -sample ${prefix}
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr//g' ))
+    END_VERSIONS
     """
 }

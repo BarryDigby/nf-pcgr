@@ -11,6 +11,7 @@ process REFORMAT_VCF {
 
     output:
     tuple val(meta), path("${prefix}.vcf.gz"), path("${prefix}.vcf.gz.tbi"), emit: vcf
+    path "versions.yml"                                                    , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -22,6 +23,11 @@ process REFORMAT_VCF {
         reformat_vcf \\
         -vcf_file $vcf \\
         -out ${prefix}.vcf
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version 2>&1 | cut -d ' ' -f 2)
+    END_VERSIONS
     """
 }
 
@@ -38,6 +44,7 @@ process REFORMAT_CNA {
 
     output:
     tuple val(meta), path("${meta.id}.*.tsv"), emit: cna
+    path "versions.yml"                      , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -49,5 +56,10 @@ process REFORMAT_CNA {
         reformat_cna \
         -cna_file $cna \
         -sample $prefix
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version 2>&1 | cut -d ' ' -f 2)
+    END_VERSIONS
     """
 }
