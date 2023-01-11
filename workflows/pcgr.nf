@@ -11,9 +11,10 @@ def checkPathParamList = [ params.input ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { exit 1, 'Please provide an input samplesheet or path to Sarek results' }
-if (params.mode.toLowerCase() == 'pcgr' && params.fasta) { ch_fasta = Channel.fromPath(params.fasta, checkIfExists:true) }
+ch_fasta = Channel.fromPath(params.fasta, checkIfExists: true)
 pcgr_header = Channel.fromPath("${projectDir}/bin/pcgr_header.txt", checkIfExists:true)
 if (params.database) { ch_pcgr_dir = Channel.fromPath("${params.database}/data/${params.genome.toLowerCase()}") } else { exit 1, "Please provide a path to the PCGR annotation database." }
+if (params.tumor_only && params.pon_vcf) { pon_vcf = file(params.pon_vcf, checkIfExists: true) } else { exit 1, "PCGR tumor-only mode selected, but PON VCF file does not exist." }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,11 +63,11 @@ workflow PCGR {
 
     INPUT_CHECK ( ch_input )
 
-    FORMAT_FILES ( ch_fasta.collect(), INPUT_CHECK.out.ch_vcf_files, INPUT_CHECK.out.ch_cna_files )
+    FORMAT_FILES ( ch_fasta.collect(), INPUT_CHECK.out.ch_vcf_files, INPUT_CHECK.out.ch_cna_files, pon_vcf )
 
     MERGE_VCFS ( FORMAT_FILES.out.somatic_files, FORMAT_FILES.out.normalised_germline, ch_fasta.collect(), pcgr_header.collect(), ch_pcgr_dir.collect() )
 
-    RUN_PCGR( MERGE_VCFS.out.pcgr_ready_vcf, ch_pcgr_dir.collect() )
+    RUN_PCGR( MERGE_VCFS.out.pcgr_ready_vcf, ch_pcgr_dir.collect(), FORMAT_FILES.out.pon_vcf.collect() )
 
     RUN_CPSR( MERGE_VCFS.out.cpsr_ready_vcf, ch_pcgr_dir.collect() )
 
@@ -77,7 +78,7 @@ workflow PCGR {
     ch_versions = ch_versions.mix( RUN_CPSR.out.versions )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
+        ch_versions.unique().collectFile(name: 'collated_versions.yml').filter{ it == 'collated_versions.yml' }.view()
     )
 
     workflow_summary    = WorkflowPcgr.paramsSummaryMultiqc(workflow, summary_params)

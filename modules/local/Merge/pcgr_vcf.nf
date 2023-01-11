@@ -21,12 +21,13 @@ process PCGR_VCF {
     def args = task.ext.args ?: ''
     prefix = task.ext.prefix ?: "${meta.id}"
     """
-    pcgr_vcf.py \
+    pcgr_vcf.py \\
+        pcgr_ready_vcf \\
         -sample ${prefix}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr//g' ))
+        python: \$(echo \$( python --version | cut -d' ' -f2 ))
     END_VERSIONS
     """
 }

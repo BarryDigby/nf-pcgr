@@ -25,7 +25,7 @@ process ISEC_SOMATIC_VCFS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr//g' ))
+        python: \$(echo \$( python --version | cut -d' ' -f2 ))
     END_VERSIONS
     """
 }

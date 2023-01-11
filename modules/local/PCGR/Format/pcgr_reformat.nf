@@ -52,10 +52,42 @@ process REFORMAT_CNA {
     script:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    reformat_cna.py \
-        reformat_cna \
-        -cna_file $cna \
+    reformat_cna.py \\
+        reformat_cna \\
+        -cna_file $cna \\
         -sample $prefix
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version 2>&1 | cut -d ' ' -f 2)
+    END_VERSIONS
+    """
+}
+
+process REFORMAT_PON {
+    tag "${pon}"
+    label 'process_low'
+
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'docker.io/barryd237/pysam-xcmds:latest' :
+        'docker.io/barryd237/pysam-xcmds:latest' }"
+
+    input:
+    path(pon)
+
+    output:
+    path "*.gz*"        , emit: pon
+    path "versions.yml" , emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
+
+    script:
+    """
+    reformat_pon.py \\
+        reformat_pon \\
+        -pon_file $pon \\
+        -out reformat.pon.vcf
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

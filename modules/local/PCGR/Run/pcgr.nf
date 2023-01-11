@@ -10,6 +10,7 @@ process PCGR {
     input:
     tuple val(meta), path(vcf), path(tbi), path(cna)
     path(pcgr_dir), stageAs: "PCGR/data/${params.genome.toLowerCase()}"
+    path pon
 
     output:
     tuple val(meta), path("${prefix}"), emit: pcgr_reports
