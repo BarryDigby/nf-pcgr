@@ -1,4 +1,0 @@
-patient,status,sample,vcf,cna
-bilbo,1,sample2,/data/github/nf-pcgr/assets/test_data/sample2.mutect2.filtered.vcf.gz,
-bilbo,1,sample2,/data/github/nf-pcgr/assets/test_data/sample2.freebayes.vcf.gz,
-bilbo,1,sample2,/data/github/nf-pcgr/assets/test_data/sample2.strelka.variants.vcf.gz,

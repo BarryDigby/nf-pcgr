@@ -283,7 +283,8 @@
                 "tumor_only": {
                     "type": "boolean",
                     "fa_icon": "fas fa-id-card",
-                    "description": "Input VCF comes from tumor-only sequencing, calls will be filtered for variants of germline origin, (default: False)"
+                    "description": "Input VCF comes from tumor-only sequencing, calls will be filtered for variants of germline origin, (default: False)",
+                    "default": false
                 },
                 "cell_line": {
                     "type": "boolean",
@@ -299,7 +300,8 @@
                 "exclude_pon": {
                     "type": "boolean",
                     "fa_icon": "fas fa-eye-slash",
-                    "description": "Exclude variants occurring in PoN (Panel of Normals, if provided as VCF (--pon_vcf), default: False)"
+                    "description": "Exclude variants occurring in PoN (Panel of Normals, if provided as VCF (--pon_vcf), default: False)",
+                    "default": false
                 },
                 "exclude_likely_hom_germline": {
                     "type": "boolean",

@@ -14,7 +14,7 @@ if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { e
 ch_fasta = Channel.fromPath(params.fasta, checkIfExists: true)
 pcgr_header = Channel.fromPath("${projectDir}/bin/pcgr_header.txt", checkIfExists:true)
 if (params.database) { ch_pcgr_dir = Channel.fromPath("${params.database}/data/${params.genome.toLowerCase()}") } else { exit 1, "Please provide a path to the PCGR annotation database." }
-if (params.tumor_only && params.pon_vcf) { pon_vcf = file(params.pon_vcf, checkIfExists: true) } else { exit 1, "PCGR tumor-only mode selected, but PON VCF file does not exist." }
+if (params.tumor_only && params.pon_vcf) { pon_vcf = file(params.pon_vcf, checkIfExists: true) } else { pon_vcf = Channel.empty() }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
