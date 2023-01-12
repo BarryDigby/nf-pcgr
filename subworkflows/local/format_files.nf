@@ -1,9 +1,9 @@
 include { BCFTOOLS_NORM as NORMALISE_VARIANTS } from '../../modules/nf-core/bcftools/norm/main'
 include { BCFTOOLS_FILTER as FILTER_VARIANTS  } from '../../modules/nf-core/bcftools/filter/main'
 include { TABIX_TABIX as TABIX_FILTERED       } from '../../modules/nf-core/tabix/tabix/main'
-include { REFORMAT_VCF } from '../../modules/local/PCGR/Format/pcgr_reformat'
-include { REFORMAT_CNA } from '../../modules/local/PCGR/Format/pcgr_reformat'
-include { REFORMAT_PON } from '../../modules/local/PCGR/Format/pcgr_reformat'
+include { REFORMAT_VCF } from '../../modules/local/pcgr_reformat'
+include { REFORMAT_CNA } from '../../modules/local/pcgr_reformat'
+include { REFORMAT_PON } from '../../modules/local/pcgr_reformat'
 
 workflow FORMAT_FILES {
     take:
@@ -33,7 +33,7 @@ workflow FORMAT_FILES {
 
     somatic_files = params.cna_analysis ? REFORMAT_VCF.out.vcf.join( copy_number ) : REFORMAT_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }
 
-
+    pon = params.tumor_only && params.pon_vcf ? REFORMAT_PON.out.pon : pon_vcf
 
     ch_versions = ch_versions.mix( NORMALISE_VARIANTS.out.versions )
     ch_versions = ch_versions.mix( FILTER_VARIANTS.out.versions )
@@ -45,6 +45,6 @@ workflow FORMAT_FILES {
     emit:
     somatic_files
     normalised_germline
-    pon_vcf = REFORMAT_PON.out.pon
+    pon_vcf = pon
     versions = ch_versions
 }

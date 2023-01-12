@@ -2,7 +2,7 @@ process CPSR_VALIDATE_INPUT {
     tag "$meta.id"
     label 'process_medium'
 
-    conda (params.enable_conda ? "pcgr::pcgr=1.2.0" : null)
+    conda "pcgr::pcgr=1.2.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'docker.io/sigven/pcgr:1.2.0':
         'docker.io/sigven/pcgr:1.2.0' }"

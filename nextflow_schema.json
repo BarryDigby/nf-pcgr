@@ -490,7 +490,7 @@
                 "filter_freebayes_somatic": {
                     "type": "string",
                     "fa_icon": "fas fa-filter",
-                    "description": "Apply filtering expression to FreeBayes (somatic) using bcftools filter."
+                    "description": "Apply filtering expression to FreeBayes (somatic/tumor-only) using bcftools filter."
                 },
                 "filter_haplotypecaller": {
                     "type": "string",
@@ -500,7 +500,7 @@
                 "filter_mutect2": {
                     "type": "string",
                     "fa_icon": "fas fa-filter",
-                    "description": "Apply filtering expression to GATK Mutect2 (somatic) using bcftools filter."
+                    "description": "Apply filtering expression to GATK Mutect2 (somatic/tumor-only) using bcftools filter."
                 },
                 "filter_strelka_indels": {
                     "type": "string",
@@ -515,7 +515,7 @@
                 "filter_strelka_variants": {
                     "type": "string",
                     "fa_icon": "fas fa-filter",
-                    "description": "Apply filtering expression to Illumina Strelka (germline) using bcftools filter."
+                    "description": "Apply filtering expression to Illumina Strelka variants (germline/tumor-only) using bcftools filter."
                 }
             }
         },

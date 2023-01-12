@@ -14,7 +14,7 @@ if (params.input) { ch_input = file(params.input, checkIfExists:true) } else { e
 ch_fasta = Channel.fromPath(params.fasta, checkIfExists: true)
 pcgr_header = Channel.fromPath("${projectDir}/bin/pcgr_header.txt", checkIfExists:true)
 if (params.database) { ch_pcgr_dir = Channel.fromPath("${params.database}/data/${params.genome.toLowerCase()}") } else { exit 1, "Please provide a path to the PCGR annotation database." }
-if (params.tumor_only && params.pon_vcf) { pon_vcf = file(params.pon_vcf, checkIfExists: true) } else { pon_vcf = Channel.empty() }
+if (params.tumor_only && params.pon_vcf) { pon_vcf = file(params.pon_vcf, checkIfExists: true) } else { pon_vcf = Channel.value([]) }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,8 +37,8 @@ include { INPUT_CHECK   } from '../subworkflows/local/input_check'
 include { FORMAT_FILES  } from '../subworkflows/local/format_files'
 include { MERGE_VCFS    } from '../subworkflows/local/merge_vcfs'
 
-include { PCGR as RUN_PCGR } from '../modules/local/PCGR/Run/pcgr'
-include { CPSR as RUN_CPSR } from '../modules/local/PCGR/Run/cpsr'
+include { PCGR as RUN_PCGR } from '../modules/local/pcgr'
+include { CPSR as RUN_CPSR } from '../modules/local/cpsr'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,7 +67,7 @@ workflow PCGR {
 
     MERGE_VCFS ( FORMAT_FILES.out.somatic_files, FORMAT_FILES.out.normalised_germline, ch_fasta.collect(), pcgr_header.collect(), ch_pcgr_dir.collect() )
 
-    RUN_PCGR( MERGE_VCFS.out.pcgr_ready_vcf, ch_pcgr_dir.collect(), FORMAT_FILES.out.pon_vcf.collect() )
+    RUN_PCGR( MERGE_VCFS.out.pcgr_ready_vcf, ch_pcgr_dir.collect(), FORMAT_FILES.out.pon_vcf )
 
     RUN_CPSR( MERGE_VCFS.out.cpsr_ready_vcf, ch_pcgr_dir.collect() )
 
@@ -78,7 +78,7 @@ workflow PCGR {
     ch_versions = ch_versions.mix( RUN_CPSR.out.versions )
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml').filter{ it == 'collated_versions.yml' }.view()
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
     workflow_summary    = WorkflowPcgr.paramsSummaryMultiqc(workflow, summary_params)
