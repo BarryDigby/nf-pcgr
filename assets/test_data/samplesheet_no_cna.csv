@@ -1,0 +1,13 @@
+patient,status,sample,vcf,cna
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.mutect2.vcf.gz,
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.freebayes.vcf.gz,
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.strelka.somatic_snvs.vcf.gz,
+HCC1395,1,HCC1395T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395T_vs_HCC1395N.strelka.somatic_indels.vcf.gz,
+HCC1395,0,HCC1395N,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395N.deepvariant.vcf.gz,
+HCC1395,0,HCC1395N,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395N.freebayes.vcf.gz,
+HCC1395,0,HCC1395N,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395N.haplotypecaller.vcf.gz,
+HCC1395,0,HCC1395N,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1395N.strelka.variants.vcf.gz,
+HCC1396,1,HCC1396T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1396T_vs_HCC1396N.mutect2.vcf.gz,
+HCC1396,1,HCC1396T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1396T_vs_HCC1396N.freebayes.vcf.gz,
+HCC1396,1,HCC1396T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1396T_vs_HCC1396N.strelka.somatic_snvs.vcf.gz,
+HCC1396,1,HCC1396T,https://raw.githubusercontent.com/BarryDigby/nf-core-pcgr/dev/assets/test_data/HCC1396T_vs_HCC1396N.strelka.somatic_indels.vcf.gz,

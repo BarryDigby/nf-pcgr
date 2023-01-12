@@ -1,20 +1,19 @@
 process CPSR {
-    tag "$meta.id"
+    tag "${meta.patient}.${meta.sample}"
     label 'process_medium'
 
-    conda (params.enable_conda ? "pcgr::pcgr=1.1.0" : null)
+    conda (params.enable_conda ? "pcgr::pcgr=1.2.0" : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'docker.io/sigven/pcgr:1.1.0':
-        'docker.io/sigven/pcgr:1.1.0' }"
+        'docker.io/sigven/pcgr:1.2.0':
+        'docker.io/sigven/pcgr:1.2.0' }"
 
     input:
-    // tuple [ meta, [vcf] , [vcf.tbi] ]
-    tuple val(meta), path(vcf), path(tbi), path(cna)
-    path(pcgr_dir), stageAs: "PCGR/data/${params.genome}"
+    tuple val(meta), path(vcf), path(tbi)
+    path(pcgr_dir), stageAs: "PCGR/data/${params.genome.toLowerCase()}"
 
     output:
+    tuple val(meta), path("${meta.patient}.${meta.sample}"), emit: cpsr_reports
     path "versions.yml"           , emit: versions
-    tuple val(meta), path("${meta.id}"), emit: cpsr_reports
 
     when:
     task.ext.when == null || task.ext.when
@@ -37,7 +36,7 @@ process CPSR {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        pcgr: \$(echo \$( pcgr --version | sed 's/pcgr//g' ))
+        pcgr: \$(echo \$( cpsr --version | sed 's/cpsr //g' ))
     END_VERSIONS
     """
 }
