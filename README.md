@@ -1,25 +1,10 @@
 # ![nf-core/pcgr](docs/images/nf-pcgr.png)
 
-[![GitHub Actions CI Status](https://github.com/nf-core/pcgr/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/pcgr/actions?query=workflow%3A%22nf-core+CI%22)
-[![GitHub Actions Linting Status](https://github.com/nf-core/pcgr/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/pcgr/actions?query=workflow%3A%22nf-core+linting%22)
-[![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?logo=Amazon%20AWS)](https://nf-co.re/pcgr/results)
-[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.XXXXXXX-1073c8)](https://doi.org/10.5281/zenodo.XXXXXXX)
-
-[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg)](https://www.nextflow.io/)
-[![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?logo=anaconda)](https://docs.conda.io/en/latest/)
-[![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?logo=docker)](https://www.docker.com/)
-[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg)](https://sylabs.io/docs/)
-[![Launch on Nextflow Tower](https://img.shields.io/badge/Launch%20%F0%9F%9A%80-Nextflow%20Tower-%234256e7)](https://tower.nf/launch?pipeline=https://github.com/nf-core/pcgr)
-
-[![Get help on Slack](http://img.shields.io/badge/slack-nf--core%20%23pcgr-4A154B?logo=slack)](https://nfcore.slack.com/channels/pcgr)
-[![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?logo=twitter)](https://twitter.com/nf_core)
-[![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?logo=youtube)](https://www.youtube.com/c/nf-core)
-
 ## Introduction
 
-<!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
+# ![nf-core/pcgr](docs/images/schematic.png)
 
-**nf-core/pcgr** is a bioinformatics best-practice analysis pipeline for downstream variant prioritisation using PCGR/CSPR designed to work off nf-core/sarek outputs.
+**nf-pcgr** is a bioinformatics analysis pipeline for the functional annotation and translation of individual genomes for precision cancer medicine, utlising the outputs from [nf-core/sarek](https://github.com/nf-core/sarek).
 
 ### --pcgr_dir
 
