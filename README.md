@@ -51,6 +51,9 @@ nextflow pull BarryDigby/nf-pcgr
 nextflow run BarryDigby/nf-pcgr -profile test,<docker/singularity> --database '<path to PCGR database>'
 ```
 
+## Parameter documentation
+
+Detailed descriptions of parameters can be found at [parameters.md](docs/parameters.md) or by running `nextflow run BarryDigby/nf-pcgr --help`.
 ## Usage
 
 ### Input samplesheet
@@ -115,15 +118,17 @@ nf-core/pcgr was originally written by Barry Digby.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 
+- [Nathan Thorpe](https://github.com/nathanthorpe)
+
 - [Sam Minot](https://github.com/sminot)
 
-- [Nathan Thorpe](https://github.com/nathanthorpe)
+- [Sigve Nakken](https://github.com/sigven)
 
 ## Contributions and Support
 
 Please open an issue or reach out to me (Barry Digby) on the nf-core slack channel.
 
-I am interested in adding compatability for additional variant calling tools.
+I am interested in adding compatability for additional variant calling tools and optimising the intake of large VCF files.
 
 ## Citations
 
