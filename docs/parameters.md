@@ -4,63 +4,61 @@
 
 Mandatory parameters for running both CPSR/PCGR.
 
-- `--genome` [string] Genome assembly used to generate VCF files. Available: grch37, grch38.
-- `--database` Path to PCGR data bundle.
+- `--genome` Genome assembly used to generate VCF files. Available: [grch37, grch38]
+- `--database` Path to PCGR data bundle
 
 ## Input/output options
 
-- `--input` Path to valid samplesheet CSV file. Please refer to documentation for valid samplesheet examples.
-- `--save_intermediates` Save tabixed, bgzipped and reformatted VCF files from a workflow run.
-  --outdir                          [string]  The output directory where the results will be saved. You have to use absolute paths to storage on Cloud
-                                              infrastructure. [default: results]
+- `--input` Path to valid samplesheet CSV file. Please refer to documentation for valid samplesheet examples
+- `--save_intermediates` Save tabixed, bgzipped and reformatted VCF files from a workflow run [default: false]
+- `--outdir`  The output directory where the results will be saved. Must use absolute paths to storage on Cloud infrastructure [default: results]
 
 PCGR options
-  --assay                           [string]  Type of DNA sequencing assay performed for input data (VCF) default: WES [default: WES]
-  --cpsr_report                     [string]  CPSR report file (Gzipped JSON - file ending with 'cpsr.<genome_assembly>.json.gz' -  germline report of patient's
-                                              blood/control sample
-  --fasta                           [string]  Reference fasta file used in Sarek analysis.
-  --tumor_site                      [number]  Optional integer code to specify primary tumor type/site of query sample [default: 0]
-  --tumor_purity                    [string]  Estimated tumor purity (between 0 and 1, (default: None)
-  --tumor_ploidy                    [string]  Estimated tumor ploidy (default: None)
-  --cna_analysis                    [boolean] Include somatic copy number alteration analysis.
-  --logr_gain                       [number]  Log ratio-threshold (minimum) for segments containing copy number gains/amplifications (default: 0.8)
+- `--assay` Type of DNA sequencing assay performed for input data (VCF) [default: WES]
+- `--cpsr_report` CPSR report file (Gzipped JSON - file ending with 'cpsr.<genome_assembly>.json.gz' -  germline report of patient's blood/control sample.
+- `--fasta` Reference fasta file used in Sarek analysis.
+- `--tumor_site`                      [number]  Optional integer code to specify primary tumor type/site of query sample [default: 0]
+  `--tumor_purity`                    [string]  Estimated tumor purity (between 0 and 1, (default: None)
+  `--tumor_ploidy`                    [string]  Estimated tumor ploidy (default: None)
+  `--cna_analysis`                    [boolean] Include somatic copy number alteration analysis.
+  `--logr_gain`                       [number]  Log ratio-threshold (minimum) for segments containing copy number gains/amplifications (default: 0.8)
                                               [default: 0.8]
-  --logr_homdel                     [number]  Log ratio-threshold (maximum) for segments containing homozygous deletions (default: -0.8) [default: -0.8]
-  --cna_overlap_pct                 [number]  Mean percent overlap between copy number segment and gene transcripts for reporting of gains/losses in tumor
+  `--logr_homdel`                     [number]  Log ratio-threshold (maximum) for segments containing homozygous deletions (default: -0.8) [default: -0.8]
+  `--cna_overlap_pct`                 [number]  Mean percent overlap between copy number segment and gene transcripts for reporting of gains/losses in tumor
                                               suppressor genes/oncogenes, (default: 50) [default: 50]
-  --target_size_mb                  [number]  For mutational burden analysis - approximate protein-coding target size in Mb of sequencing assay (default: 34
+  `--target_size_mb`                  [number]  For mutational burden analysis - approximate protein-coding target size in Mb of sequencing assay (default: 34
                                               WGS/WES) [default: 34]
-  --estimate_tmb                    [boolean] Estimate tumor mutational burden from the total number of somatic mutations and target region size, default:
+  `--estimate_tmb`                    [boolean] Estimate tumor mutational burden from the total number of somatic mutations and target region size, default:
                                               False
-  --estimate_msi_status             [boolean] Predict microsatellite instability status from patterns of somatic mutations/indels, default: False
-  --tmb_algorithm                   [string]  Method for calculation of TMB, all coding variants (Chalmers et al., Genome Medicine, 2017), or non-synonymous
+  `--estimate_msi_status`             [boolean] Predict microsatellite instability status from patterns of somatic mutations/indels, default: False
+  `--tmb_algorithm`                   [string]  Method for calculation of TMB, all coding variants (Chalmers et al., Genome Medicine, 2017), or non-synonymous
                                               variants only, default: all_coding [default: all_coding]
-  --estimate_signatures             [boolean] Estimate relative contributions of reference mutational signatures in query sample and detect potential kataegis
+  `--estimate_signatures`             [boolean] Estimate relative contributions of reference mutational signatures in query sample and detect potential kataegis
                                               events, default: False
-  --min_mutations_signatures        [number]  Minimum number of SNVs required for reconstruction of mutational signatures (SBS) by MutationalPatterns (default:
+  `--min_mutations_signatures`        [number]  Minimum number of SNVs required for reconstruction of mutational signatures (SBS) by MutationalPatterns (default:
                                               200, minimum n = 100) [default: 200]
-  --all_reference_signatures        [boolean] Use all reference mutational signatures (SBS, n = 67) in signature reconstruction rather than only those already
+  `--all_reference_signatures`        [boolean] Use all reference mutational signatures (SBS, n = 67) in signature reconstruction rather than only those already
                                               attributed to the tumor type (default: False)
-  --include_artefact_signatures     [boolean] Include sequencing artefacts in the collection of reference signatures (default: False)
-  --prevalence_reference_signatures [number]  Minimum tumor-type prevalence (in percent) of reference signatures to be included in refitting procedure (default:
+  `--include_artefact_signatures`     [boolean] Include sequencing artefacts in the collection of reference signatures (default: False)
+  `--prevalence_reference_signatures` [number]  Minimum tumor-type prevalence (in percent) of reference signatures to be included in refitting procedure (default:
                                               5) [default: 5]
-  --include_trials                  [boolean] Include relevant ongoing or future clinical trials, focusing on studies with molecularly targeted
+  `--include_trials`                  [boolean] Include relevant ongoing or future clinical trials, focusing on studies with molecularly targeted
                                               interventions
-  --tumor_dp_tag                    [string]  Specify VCF INFO tag for sequencing depth (tumor, must be Type=Integer, default: TDP) [default: TDP]
-  --tumor_af_tag                    [string]  Specify VCF INFO tag for variant allelic fraction (tumor,  must be Type=Float, default: TAF) [default:
+  `--tumor_dp_tag`                    [string]  Specify VCF INFO tag for sequencing depth (tumor, must be Type=Integer, default: TDP) [default: TDP]
+  `--tumor_af_tag`                    [string]  Specify VCF INFO tag for variant allelic fraction (tumor,  must be Type=Float, default: TAF) [default:
                                               TAF]
-  --control_dp_tag                  [string]  Specify VCF INFO tag for sequencing depth (control, must be Type=Integer, default: NDP) [default: NDP]
-  --control_af_tag                  [string]  Specify VCF INFO tag for variant allelic fraction (control, must be Type=Float, default: NAF) [default:
+  `--control_dp_tag`                  [string]  Specify VCF INFO tag for sequencing depth (control, must be Type=Integer, default: NDP) [default: NDP]
+  `--control_af_tag`                  [string]  Specify VCF INFO tag for variant allelic fraction (control, must be Type=Float, default: NAF) [default:
                                               NAF]
-  --call_conf_tag                   [string]  Specify VCF INFO tag for somatic variant call confidence (must be categorical, e.g. Type=String, default:
+  `--call_conf_tag`                   [string]  Specify VCF INFO tag for somatic variant call confidence (must be categorical, e.g. Type=String, default:
                                               _NA_) [default: TAL]
-  --tumor_dp_min                    [number]  If VCF INFO tag for sequencing depth (tumor) is specified and found, set minimum required depth for inclusion in
+  `--tumor_dp_min`                    [number]  If VCF INFO tag for sequencing depth (tumor) is specified and found, set minimum required depth for inclusion in
                                               report (default: 0) [default: 0]
-  --tumor_af_min                    [number]  If VCF INFO tag for variant allelic fraction (tumor) is specified and found, set minimum required AF for inclusion
+  `--tumor_af_min`                    [number]  If VCF INFO tag for variant allelic fraction (tumor) is specified and found, set minimum required AF for inclusion
                                               in report (default: 0) [default: 0]
-  --control_dp_min                  [number]  If VCF INFO tag for sequencing depth (control) is specified and found, set minimum required depth for inclusion in
+  `--control_dp_min`                  [number]  If VCF INFO tag for sequencing depth (control) is specified and found, set minimum required depth for inclusion in
                                               report (default: 0) [default: 0]
-  --control_af_max                  [number]  If VCF INFO tag for variant allelic fraction (control) is specified and found, set maximum tolerated AF for
+  `--control_af_max`                  [number]  If VCF INFO tag for variant allelic fraction (control) is specified and found, set maximum tolerated AF for
                                               inclusion in report (default: 1) [default: 1]
 
 PCGR (Tumor-only) options

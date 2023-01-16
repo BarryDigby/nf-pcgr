@@ -63,7 +63,7 @@ The workflow accepts as input a `samplesheet.csv` file containing the paths to S
 | Column  |                                                      Description                                                     |
 |---------|:---------------------------------------------------------------------------------------------------------------------|
 | patient |      Designates the patient/subject; must be unique for each patient, but one patient can have multiple samples      |
-| status  |                                             Normal/tumor status of sample                                            |
+| status  |                                             Normal/tumor (0/1) status of sample                                      |
 | sample  | Designates the sample ID; must be unique. A patient may have multiple samples e.g a paired tumor-normal, tumor-only. |
 | vcf     |                                               Full path to VCF file(s)                                               |
 | cna     |                                                 Full path to CNS file                                                |
