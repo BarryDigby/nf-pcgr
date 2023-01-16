@@ -69,7 +69,7 @@ The workflow accepts as input a `samplesheet.csv` file containing the paths to S
 
 An example of a valid samplesheet is given below:
 
-```console
+```bash
 patient,status,sample,vcf,cna
 HCC1395,1,HCC1395T,HCC1395T_vs_HCC1395N.mutect2.vcf.gz,HCC1395T.cns
 HCC1395,1,HCC1395T,HCC1395T_vs_HCC1395N.freebayes.vcf.gz,HCC1395T.cns
