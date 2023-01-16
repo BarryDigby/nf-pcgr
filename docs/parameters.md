@@ -11,7 +11,8 @@ Mandatory parameters for running both CPSR/PCGR.
 
 - `--input` Path to valid samplesheet CSV file. Please refer to documentation for valid samplesheet examples
 - `--save_intermediates` Save tabixed, bgzipped and reformatted VCF files from a workflow run [default: false]
-- `--outdir`  The output directory where the results will be saved. Must use absolute paths to storage on Cloud infrastructure [default: results]
+- `--outdir`  The output directory where the results will be saved. Must use absolute paths to storage on Cloud infrastructure [default:
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; results]
 
 PCGR options
 - `--assay` Type of DNA sequencing assay performed for input data (VCF) [default: WES]
