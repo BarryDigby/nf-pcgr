@@ -20,7 +20,7 @@ Define input paths, output directory for results and toggle saving intermediate 
 
 Define `PCGR` parameters. To invoke copy number alteration analysis and tumor mutational burden analysis, set `--cna_analysis` and `--tmb_analysis` respectively, to `true`.
 
-- `--assay` Type of DNA sequencing assay performed for input data (VCF) [default: WES]
+- `--assay` Type of DNA sequencing assay performed for input data (VCF). Available: [WES,WGS,TARGETED] [default: WES]
 - `--cpsr_report` CPSR report file (Gzipped JSON - file ending with 'cpsr.<genome_assembly>.json.gz' -  germline report of patient's blood/control sample.
 - `--tumor_site` Optional integer code to specify primary tumor type/site of query sample [default: 0]
 
