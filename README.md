@@ -52,6 +52,8 @@ nextflow pull BarryDigby/nf-pcgr
 nextflow run BarryDigby/nf-pcgr -profile test,<docker/singularity> --database '<path to PCGR database>'
 ```
 
+> Re-run the command if you encounter a `FileNotFoundError` - the test data did not fully download prior to workflow execution.
+
 ## Parameter documentation
 
 Detailed descriptions of parameters can be found at [parameters.md](docs/parameters.md) or by running `nextflow run BarryDigby/nf-pcgr --help`.

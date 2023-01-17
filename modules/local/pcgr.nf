@@ -34,6 +34,11 @@ process PCGR {
         --output_dir $prefix \\
         --genome_assembly $genome \\
         --sample_id $prefix \\
+        --tumor_dp_tag 'TDP' \\
+        --tumor_af_tag 'TAF' \\
+        --control_dp_tag 'NDP' \\
+        --control_af_tag 'NAF' \\
+        --call_conf_tag 'TAL' \\
         $cna \\
         $args
 
