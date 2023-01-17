@@ -1,9 +1,9 @@
-include { CPSR_VALIDATE_INPUT } from '../../modules/local/cpsr/validate_input'
+include { CPSR_VALIDATE_INPUT } from '../../modules/local/validate_input'
 include { TABIX_BGZIPTABIX as BGZIPTABIX_CPSR } from '../../modules/nf-core/tabix/bgziptabix/main'
 include { BCFTOOLS_CONCAT } from '../../modules/nf-core/bcftools/concat/main'
 include { TABIX_TABIX as TABIX_CONCAT } from '../../modules/nf-core/tabix/tabix/main'
-include { ISEC_SOMATIC_VCFS as INTERSECT_SOMATIC_VARIANTS } from '../../modules/local/Merge/isec_vcfs'
-include { PCGR_VCF as PCGR_READY_VCF } from '../../modules/local/Merge/pcgr_vcf'
+include { ISEC_SOMATIC_VCFS as INTERSECT_SOMATIC_VARIANTS } from '../../modules/local/isec_vcfs'
+include { PCGR_VCF as PCGR_READY_VCF } from '../../modules/local/pcgr_vcf'
 
 workflow MERGE_VCFS {
     take:
@@ -39,7 +39,7 @@ workflow MERGE_VCFS {
     ch_versions = ch_versions.mix( BCFTOOLS_CONCAT.out.versions )
     ch_versions = ch_versions.mix( TABIX_CONCAT.out.versions )
     ch_versions = ch_versions.mix( INTERSECT_SOMATIC_VARIANTS.out.versions )
-    ch_versions = ch_versions.mix( PCGR_READY_VCF.out.vcf )
+    ch_versions = ch_versions.mix( PCGR_READY_VCF.out.versions )
 
     emit:
     pcgr_ready_vcf = params.cna_analysis ? PCGR_READY_VCF.out.vcf.join( per_sample_somatic.map{ meta, vcf, tbi, cna -> return [ meta, cna ] } ) : PCGR_READY_VCF.out.vcf.map{ meta, vcf, tbi -> return [ meta, vcf, tbi, [] ] }

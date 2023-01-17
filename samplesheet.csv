@@ -1,3 +1,0 @@
-patient,status,sample,vcf,cna
-HCC1395,1,HCC1395T,/Users/bdigby/Documents/aws_somatic/HCC1395T_vs_HCC1395N.mutect2.vcf.gz,/Users/bdigby/Documents/aws_somatic/HCC1395T.cns
-HCC1395,1,HCC1395T,/Users/bdigby/Documents/aws_somatic/HCC1395T_vs_HCC1395N.strelka.somatic_snvs.vcf.gz,/Users/bdigby/Documents/aws_somatic/HCC1395T.cns

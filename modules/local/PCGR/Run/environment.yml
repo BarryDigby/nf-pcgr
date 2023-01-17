@@ -1,6 +1,0 @@
-name: nf-core-mamba
-channels:
-  - conda-forge
-
-dependencies:
-  - conda-forge::mamba=0.25.0
