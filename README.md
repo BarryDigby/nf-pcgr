@@ -71,8 +71,6 @@ The workflow accepts as input a `samplesheet.csv` file containing the paths to S
 | vcf     |                                               Full path to VCF file(s)                                               |
 | cna     |                                                 Full path to CNS file                                                |
 
-***
-
 An example of a valid samplesheet is given below:
 
 ```bash
@@ -90,6 +88,8 @@ HCC1396,1,HCC1396T,HCC1396T_vs_HCC1396N.freebayes.vcf.gz,
 HCC1396,1,HCC1396T,HCC1396T_vs_HCC1396N.strelka.somatic_snvs.vcf.gz,
 HCC1396,1,HCC1396T,HCC1396T_vs_HCC1396N.strelka.somatic_indels.vcf.gz,
 ```
+
+> copy number abberation `.cns` files must be present for every sample entry when `--cna_analysis true`.
 
 ### File names
 
